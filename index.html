@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=3840, height=1920, initial-scale=1">
+  <meta name="screen-orientation" content="landscape">
+  <title>农发集团智慧农业综合管控平台</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://registry.npmmirror.com/echarts/5.5.0/files/dist/echarts.min.js"></script>
+</head>
+<body>
+  <div id="scale-wrapper">
+    <div id="scale-inner">
+      <div id="dashboard" class="dashboard">
+
+        <header class="header">
+          <div class="header-left">
+            <div class="title-group">
+              <h1>农发集团智慧农业综合管控平台</h1>
+            </div>
+          </div>
+          <div class="ppt-progress">
+            <span class="ppt-dot active" data-slide="1"></span>
+            <span class="ppt-dot" data-slide="2"></span>
+          </div>
+        </header>
+
+        <main class="main-body main-body-img">
+          <img src="assets/shouye.png" alt="首页" class="shouye-img">
+        </main>
+
+        <div id="popup-hotzone-1" class="popup-hotzone"></div>
+        <div id="popup-hotzone-11" class="popup-hotzone"></div>
+        <div id="popup-float-11" class="popup-float hidden">
+          <span class="popup-label popup-label-lg">落实四个功能定位</span><br>
+          <span class="popup-value">作为承接国家农业政策的主要载体、整合省内优质农业资源的平台、发展农业新质生产力的开拓者、保障全省粮食安全的主力军。</span>
+        </div>
+
+        <div id="popup-hotzone-10" class="popup-hotzone"></div>
+        <div id="popup-float-10" class="popup-float hidden">
+          <span class="popup-label popup-label-lg">"三步走"发展步骤</span><br>
+          <span class="popup-value">第一阶段重组整合后，围绕土地、种业和粮食等方面夯实基础性工作；第二阶段向米袋子、菜篮子、油瓶子和肉案子迈进；第三阶段切实发挥省政府实施大农业产业集群战略的市场抓手和桥梁纽带作用，真正成为全国人民的大型原粮供应商和全省人民主要的餐桌供应商。</span>
+        </div>
+
+        <div id="popup-hotzone-9" class="popup-hotzone"></div>
+        <div id="popup-float-9" class="popup-float hidden">
+          <span class="popup-label popup-label-lg">实现两个转型</span><br>
+          <span class="popup-value">从"投资平台"向"实体产业集团"转型；从"粮食仓储贸易"向"从土地到种子到餐桌全链条业务以及粮食精深加工"转型。</span>
+        </div>
+
+        <div id="popup-hotzone-8" class="popup-hotzone"></div>
+        <div id="popup-float-8" class="popup-float hidden">
+          <span class="popup-label popup-label-lg">聚焦一个目标</span><br>
+          <span class="popup-value">对标国内一流、打造区域领先的现代大农业产业集团。</span>
+        </div>
+
+        <div id="popup-hotzone-7" class="popup-hotzone"></div>
+        <div id="popup-float-7" class="popup-float hidden">
+          <span class="popup-label">方向：</span><br>
+          <span class="popup-value">服务千万头肉牛工程，聚焦精深加工、品牌培育、冷链物流</span><br>
+          <span class="popup-label">目标：</span><br>
+          <span class="popup-value">推动从"卖活体牛"向"卖牛产品"转变，实现一二三产融合</span>
+        </div>
+
+        <div id="popup-hotzone-6" class="popup-hotzone"></div>
+        <div id="popup-float-6" class="popup-float hidden">
+          <span class="popup-label">平台：</span><br>
+          <span class="popup-value">依托三侬数科，搭建粮食数字化交易综合服务平台</span><br>
+          <span class="popup-label">应用：</span><br>
+          <span class="popup-value">建设智慧农场样板，输出"吉农发"智慧农业解决方案</span>
+        </div>
+
+        <div id="popup-hotzone-5" class="popup-hotzone"></div>
+        <div id="popup-float-5" class="popup-float hidden">
+          <span class="popup-label">种业：</span><br>
+          <span class="popup-value">重组吉农高新，联合科研院所，构建"育繁推"一体化，主攻玉米/水稻/大豆/肉牛品种</span><br>
+          <span class="popup-label">农资农机农技：</span><br>
+          <span class="popup-value">打造"合作社+企业+农户"模式，提供一站式综合农事服务</span>
+        </div>
+
+        <div id="popup-hotzone-4" class="popup-hotzone"></div>
+        <div id="popup-float-4" class="popup-float hidden">
+          <span class="popup-label">大成集团：</span><br>
+          <span class="popup-value">实施"十大工程"改革脱困，2026年大合园区利润5000万元，兴隆山园区正向现金流</span><br>
+          <span class="popup-label">生态食品集团：</span><br>
+          <span class="popup-value">聚焦鲜食玉米等8大品类、150个单品，2026年销售额超5亿元，打造2-3个知名品牌</span>
+        </div>
+
+        <div id="popup-hotzone-3" class="popup-hotzone"></div>
+        <div id="popup-float-3" class="popup-float hidden">
+          <span class="popup-label">定位：</span><br>
+          <span class="popup-value">大型粮食供应商，构建"北粮南运"业务链</span><br>
+          <span class="popup-label">目标：</span><br>
+          <span class="popup-value">2026年底有效仓容150万吨，累计经营量500万吨</span>
+        </div>
+
+        <div id="popup-hotzone-2" class="popup-hotzone"></div>
+        <div id="popup-float-2" class="popup-float hidden">
+          <span class="popup-label">模式：</span><br>
+          <span class="popup-value">"融投建运管"五位一体，推进高标准农田+盐碱地治理</span><br>
+          <span class="popup-label">目标：</span><br>
+          <span class="popup-value">2026年底累计高标准农田300万亩，其中流转归集耕地90万亩</span>
+        </div>
+
+        <div id="popup-float-1" class="popup-float hidden">
+          <span class="popup-label">先期整合：</span><br>
+          <span class="popup-value">镇南种羊场、吉源农业、长岭种马场 → 组建大型农垦集团</span><br>
+          <span class="popup-label">后期拓展：</span><br>
+          <span class="popup-value">整合县域农垦资源，土地面积达532万亩，自有经营耕地突破300万亩</span>
+        </div>
+
+        <footer class="footer">
+          <div class="entry-card entry-teal" data-target="park">
+            <div class="entry-corner tl"></div><div class="entry-corner tr"></div>
+            <div class="entry-corner bl"></div><div class="entry-corner br"></div>
+            <div class="entry-icon-wrap"><span class="entry-icon">⬡</span></div>
+            <div class="entry-text">
+              <div class="entry-title">示范园区一张图</div>
+              <div class="entry-desc">示范产业园区可视化管理</div>
+            </div>
+            <div class="entry-arrow">▶</div>
+          </div>
+          <div class="entry-card entry-blue" data-target="nongken">
+            <div class="entry-corner tl"></div><div class="entry-corner tr"></div>
+            <div class="entry-corner bl"></div><div class="entry-corner br"></div>
+            <div class="entry-icon-wrap"><span class="entry-icon">⬡</span></div>
+            <div class="entry-text">
+              <div class="entry-title">农垦一张图</div>
+              <div class="entry-desc">集团土地资源统一管理</div>
+            </div>
+            <div class="entry-arrow">▶</div>
+          </div>
+          <div class="entry-card entry-green" data-target="land-dev">
+            <div class="entry-corner tl"></div><div class="entry-corner tr"></div>
+            <div class="entry-corner bl"></div><div class="entry-corner br"></div>
+            <div class="entry-icon-wrap"><span class="entry-icon">⬡</span></div>
+            <div class="entry-text">
+              <div class="entry-title">土地资源开发公司一张图</div>
+              <div class="entry-desc">土地开发业务可视化</div>
+            </div>
+            <div class="entry-arrow">▶</div>
+          </div>
+          <div class="entry-card entry-yellow" data-target="grain">
+            <div class="entry-corner tl"></div><div class="entry-corner tr"></div>
+            <div class="entry-corner bl"></div><div class="entry-corner br"></div>
+            <div class="entry-icon-wrap"><span class="entry-icon">⬡</span></div>
+            <div class="entry-text">
+              <div class="entry-title">粮食集团一张图</div>
+              <div class="entry-desc">粮食仓储加工管理</div>
+            </div>
+            <div class="entry-arrow">▶</div>
+          </div>
+          <div class="entry-card entry-purple" data-target="food">
+            <div class="entry-corner tl"></div><div class="entry-corner tr"></div>
+            <div class="entry-corner bl"></div><div class="entry-corner br"></div>
+            <div class="entry-icon-wrap"><span class="entry-icon">⬡</span></div>
+            <div class="entry-text">
+              <div class="entry-title">食品公司一张图</div>
+              <div class="entry-desc">食品生产质量管理</div>
+            </div>
+            <div class="entry-arrow">▶</div>
+          </div>
+        </footer>
+
+      </div>
+
+      <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+          <div class="modal-header">
+            <div>
+              <h2 id="modal-title">白城牧场</h2>
+            </div>
+            <button id="modal-close" class="modal-close">×</button>
+          </div>
+          <div class="modal-tabs">
+            <button class="tab active" data-tab="basic">基础信息</button>
+            <button class="tab" data-tab="land">土地资源</button>
+            <button class="tab" data-tab="business">经营数据</button>
+            <button class="tab" data-tab="production">生产数据</button>
+            <button class="tab" data-tab="device">设备数据</button>
+          </div>
+          <div class="modal-body">
+            <div id="tab-basic" class="tab-panel active"></div>
+            <div id="tab-land" class="tab-panel"></div>
+            <div id="tab-business" class="tab-panel"></div>
+            <div id="tab-production" class="tab-panel"></div>
+            <div id="tab-device" class="tab-panel"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="business-popover-overlay" class="business-popover-overlay hidden">
+        <div class="business-popover">
+          <button type="button" id="business-popover-close" class="business-popover-close" aria-label="关闭">×</button>
+          <div class="business-popover-head">
+            <span class="business-popover-num" id="business-pop-num"></span>
+            <h3 id="business-pop-title"></h3>
+            <p class="business-popover-entity" id="business-pop-entity"></p>
+          </div>
+          <div class="business-popover-body" id="business-pop-body"></div>
+        </div>
+      </div>
+
+      <div id="toast-overlay" class="toast-overlay hidden">
+        <div class="toast-card">
+          <button id="toast-close" class="toast-close">×</button>
+          <div class="toast-icon">⏳</div>
+          <div class="toast-text">敬请期待</div>
+        </div>
+      </div>
+
+      <div id="park-overlay" class="park-overlay hidden">
+        <div class="park-overlay-bg"></div>
+        <button id="park-overlay-close" class="park-overlay-close">×</button>
+        <div class="park-slides-wrapper">
+          <img src="assets/park-slide-2.png" class="park-slide active" data-index="0" alt="示范产业园区">
+          <img src="assets/park-slide-1.png" class="park-slide" data-index="1" alt="示范产业园区">
+          <img src="assets/park-slide-3.jpg" class="park-slide" data-index="2" alt="示范产业园区">
+        </div>
+        <div class="park-nav-bar">
+          <button class="park-nav-btn active" data-index="0">战略定位核心数据与进展</button>
+          <button class="park-nav-btn" data-index="1">运营模式&机制及未来规划</button>
+          <button class="park-nav-btn" data-index="2">重点支撑项目</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

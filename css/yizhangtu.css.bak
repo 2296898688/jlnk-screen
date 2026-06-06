@@ -1,0 +1,4476 @@
+/* 农垦一张图 — 3840×1920 · 15% | 70% | 15% */
+:root {
+  --yzt-header-h: 180px;
+  --yzt-tabbar-h: 160px;
+  --yzt-body-h: calc(var(--dash-h) - var(--yzt-header-h));
+  --yzt-col-left-pct: 15%;
+  --yzt-col-center-pct: 70%;
+  --yzt-col-right-pct: 15%;
+  /* 土地资源侧栏：按画布高度均分，给 ECharts 明确像素高度 */
+  --yzt-land-side-pad: 20px;
+  --yzt-land-label-h: 52px;
+  --yzt-land-head-h: 36px;
+  --yzt-land-gap: 10px;
+  --yzt-land-usable-h: calc(var(--yzt-body-h) - var(--yzt-land-side-pad) - var(--yzt-land-label-h));
+  --yzt-land-block-h-left: calc((var(--yzt-land-usable-h) - 2 * var(--yzt-land-gap)) / 3);
+  --yzt-land-block-h-right: calc((var(--yzt-land-usable-h) - 1 * var(--yzt-land-gap)) / 2);
+  --yzt-land-plot-h-left: calc(var(--yzt-land-block-h-left) - var(--yzt-land-head-h) - 12px);
+  --yzt-land-plot-h-right: calc(var(--yzt-land-block-h-right) - var(--yzt-land-head-h) - 12px);
+  --yzt-land-block-h-left-farm: calc((var(--yzt-land-usable-h) - 3 * var(--yzt-land-gap)) / 4);
+  --yzt-land-plot-h-left-farm: calc(var(--yzt-land-block-h-left-farm) - var(--yzt-land-head-h) - 12px);
+  /* 土地资源语义色 */
+  --yzt-c-core: #00A86B;
+  --yzt-c-second: #66D9A3;
+  --yzt-c-neutral: #00B4D8;
+  --yzt-c-warn: #FF9F1C;
+  --yzt-c-muted: #4A5568;
+}
+
+/* 一张图专用字号：3840 画布整体抬升，缩放后正文仍清晰可读 */
+.yzt-dashboard {
+  --fs-xs: 44px;
+  --fs-sm: 50px;
+  --fs-base: 54px;
+  --fs-md: 60px;
+  --fs-lg: 76px;
+  --fs-xl: 92px;
+  --fs-2xl: 108px;
+  --font-num: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: var(--fs-base);
+  line-height: 1.45;
+}
+
+.yzt-hidden { display: none !important; }
+
+.yzt-dashboard {
+  width: var(--dash-w);
+  height: var(--dash-h);
+  background: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(0, 100, 80, 0.1) 0%, transparent 55%);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ===== 顶部通栏 3840×240 ===== */
+.yzt-header {
+  height: var(--yzt-header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  border-bottom: none;
+  background: linear-gradient(180deg, rgba(0, 50, 40, 0.5) 0%, transparent 100%);
+  flex-shrink: 0;
+  gap: 24px;
+}
+
+.yzt-header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  min-width: 0;
+}
+
+.yzt-header-left .logo svg { width: 52px; height: 52px; }
+
+.yzt-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid var(--border-cyan);
+  border-radius: 4px;
+  background: rgba(0, 212, 255, 0.08);
+  color: var(--accent-cyan);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.yzt-back-btn:hover {
+  background: rgba(0, 212, 255, 0.18);
+  box-shadow: 0 0 16px rgba(0, 212, 255, 0.2);
+}
+
+.yzt-title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.yzt-title-row h1 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.yzt-drill-back-btn {
+  display: flex;
+  align-items: center;
+  padding: 8px 18px;
+  border: 1px solid var(--accent-green);
+  border-radius: 4px;
+  background: rgba(0, 255, 136, 0.1);
+  color: var(--accent-green);
+  font-size: 40px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.yzt-drill-back-btn:hover {
+  background: rgba(0, 255, 136, 0.2);
+  box-shadow: 0 0 14px rgba(0, 255, 136, 0.2);
+}
+
+.yzt-drill-back-btn.hidden { display: none; }
+
+.yzt-title-group h1 {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+}
+
+.yzt-title-group .subtitle {
+  font-size: 40px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.yzt-layer-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+  align-items: center;
+}
+
+.yzt-map-filter-bar .yzt-layer-chip {
+  padding: 5px 16px;
+  font-size: 40px;
+  white-space: nowrap;
+}
+
+.yzt-map-filter-bar .yzt-layer-chip[data-layer="iot"] .dot { background: #00FF88; }
+.yzt-map-filter-bar .yzt-layer-chip[data-layer="remote"] .dot { background: #B388FF; }
+.yzt-map-filter-bar .yzt-layer-chip[data-layer="weather"] .dot { background: #00D4FF; }
+.yzt-map-filter-bar .yzt-layer-chip[data-layer="disaster"] .dot { background: #FF6B6B; }
+.yzt-map-filter-bar .yzt-layer-chip[data-layer="farm"] .dot { background: #FFB800; }
+
+.yzt-map-filter-bar .yzt-layer-chip:not(.active) .dot { opacity: 0.45; }
+
+.yzt-layer-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  font-size: 40px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.yzt-layer-chip.active {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.15);
+}
+
+.yzt-layer-chip .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.yzt-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.yzt-time {
+  padding: 8px 16px;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  font-size: var(--fs-xs);
+  font-family: var(--font-num);
+  color: var(--accent-green);
+}
+
+/* ===== 主体 15% | 70% | 15% ===== */
+.yzt-body {
+  height: var(--yzt-body-h);
+  display: flex;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.yzt-side {
+  width: var(--yzt-col-left-pct);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.yzt-center {
+  width: var(--yzt-col-center-pct);
+  height: 100%;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  background: #020810;
+}
+
+.yzt-side-right {
+  width: var(--yzt-col-right-pct);
+  border-right: none;
+  border-left: 1px solid var(--border);
+  padding: 10px 8px;
+  gap: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.yzt-side-grow {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.yzt-side-left {
+  padding: 10px 8px;
+  gap: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+/* 左栏：地块检索 + 网格 */
+.yzt-plot-search-bar {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.yzt-plot-search-bar .yzt-search-input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  font-size: 38px;
+  font-family: var(--font-ui);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  min-height: 52px;
+}
+
+.yzt-plot-search-bar .yzt-search-input:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+}
+
+.yzt-plot-search-bar .yzt-search-input::placeholder {
+  color: rgba(170, 210, 240, 0.45);
+}
+
+.yzt-plot-search-btn {
+  flex-shrink: 0;
+  min-width: 88px;
+  padding: 12px 18px;
+  font-size: 38px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: #042818;
+  background: linear-gradient(180deg, #00FF88, #00CC6A);
+  border: 1px solid rgba(0, 255, 136, 0.6);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.yzt-plot-search-btn:hover {
+  box-shadow: 0 0 16px rgba(0, 255, 136, 0.35);
+  filter: brightness(1.05);
+}
+
+/* 农场选择（白城 / 镇南） */
+.yzt-farm-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.yzt-farm-pick {
+  padding: 12px 10px;
+  font-size: 46px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yzt-farm-pick:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.yzt-farm-pick.active {
+  color: var(--accent-green);
+  border-color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.12);
+}
+
+.yzt-plot-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: 4px 2px 6px;
+  border-bottom: 1px solid rgba(0, 255, 160, 0.12);
+}
+
+.yzt-plot-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--accent-green);
+}
+
+.yzt-plot-panel-title .icon {
+  font-size: 44px;
+  opacity: 0.9;
+}
+
+.yzt-plot-panel-count {
+  font-size: 46px;
+  color: var(--text-secondary);
+}
+
+.yzt-plot-panel-count span {
+  color: var(--accent-cyan);
+  font-family: var(--font-num);
+  font-weight: 700;
+}
+
+.yzt-plot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  align-content: start;
+  padding: 8px 2px 4px;
+}
+
+.yzt-plot-grid::-webkit-scrollbar,
+.yzt-detail-list::-webkit-scrollbar { width: 4px; }
+
+.yzt-plot-grid::-webkit-scrollbar-thumb,
+.yzt-detail-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 136, 0.35);
+  border-radius: 2px;
+}
+
+.yzt-plot-chip {
+  min-height: 108px;
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(0, 255, 160, 0.14);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.yzt-plot-chip:hover {
+  border-color: rgba(0, 212, 255, 0.45);
+  background: rgba(0, 212, 255, 0.05);
+}
+
+.yzt-plot-chip.active {
+  border-color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.08);
+  box-shadow: 0 0 14px rgba(0, 255, 136, 0.18);
+}
+
+.yzt-plot-chip-icon {
+  width: 40px;
+  height: 44px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.yzt-plot-chip-icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 255, 136, 0.35), rgba(0, 255, 136, 0.08));
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border: 1px solid rgba(0, 255, 136, 0.5);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.25);
+}
+
+.yzt-plot-chip.active .yzt-plot-chip-icon::before {
+  background: linear-gradient(180deg, rgba(0, 255, 136, 0.55), rgba(0, 255, 136, 0.15));
+  box-shadow: 0 0 16px rgba(0, 255, 136, 0.45);
+}
+
+.yzt-plot-chip-name {
+  font-size: 40px;
+  color: rgba(200, 220, 240, 0.75);
+  text-align: center;
+  line-height: 1.25;
+  word-break: break-all;
+  max-width: 100%;
+}
+
+.yzt-plot-chip.active .yzt-plot-chip-name {
+  color: var(--accent-green);
+  font-weight: 600;
+}
+
+/* 选中地块明细（网格下方） */
+.yzt-plot-detail {
+  flex-shrink: 0;
+  display: none;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 255, 160, 0.2);
+  max-height: 38%;
+  overflow-y: auto;
+}
+
+.yzt-plot-detail.show {
+  display: block;
+}
+
+.yzt-plot-detail-title {
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--accent-green);
+  margin-bottom: 10px;
+  padding-left: 8px;
+  border-left: 3px solid var(--accent-cyan);
+}
+
+.yzt-plot-detail-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yzt-plot-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(0, 255, 160, 0.12);
+  border-radius: 6px;
+  font-size: 44px;
+}
+
+.yzt-plot-detail-row .lbl {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.yzt-plot-detail-row .val {
+  color: var(--text-primary);
+  font-family: var(--font-num);
+  text-align: right;
+}
+
+.yzt-plot-detail-row .val.hl {
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+.yzt-side-label {
+  font-size: 40px;
+  color: var(--accent-green);
+  font-weight: 600;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+  padding-left: 8px;
+  border-left: 3px solid var(--accent-cyan);
+}
+
+.yzt-side-search {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.yzt-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-cyan);
+  font-size: 44px;
+  pointer-events: none;
+}
+
+.yzt-search-input {
+  width: 100%;
+  padding: 14px 14px 14px 42px;
+  font-size: 44px;
+  font-family: var(--font-ui);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  min-height: 52px;
+}
+
+.yzt-search-input:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.15);
+}
+
+.yzt-farm-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 42%;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.yzt-farm-cards::-webkit-scrollbar,
+.yzt-plot-grid::-webkit-scrollbar,
+.yzt-detail-list::-webkit-scrollbar { width: 4px; }
+
+.yzt-farm-cards::-webkit-scrollbar-thumb,
+.yzt-plot-grid::-webkit-scrollbar-thumb,
+.yzt-detail-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 136, 0.35);
+  border-radius: 2px;
+}
+
+.yzt-farm-card {
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.yzt-farm-card:hover {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 212, 255, 0.06);
+}
+
+.yzt-farm-card.active {
+  border-color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 14px rgba(0, 255, 136, 0.12);
+}
+
+.yzt-farm-card .fc-name {
+  font-size: 46px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.yzt-farm-card .fc-meta {
+  font-size: 38px;
+  color: var(--text-secondary);
+}
+
+.yzt-farm-card .fc-meta em {
+  color: var(--accent-cyan);
+  font-style: normal;
+  font-family: var(--font-num);
+}
+
+.yzt-plot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  align-content: start;
+  padding-right: 2px;
+}
+
+.yzt-plot-cell {
+  padding: 12px 10px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(0, 255, 160, 0.15);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+.yzt-plot-cell:hover {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 212, 255, 0.06);
+}
+
+.yzt-plot-cell.active {
+  border-color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.yzt-plot-cell .pc-name {
+  font-size: 38px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yzt-plot-cell .pc-meta {
+  font-size: 46px;
+  color: var(--text-secondary);
+}
+
+.yzt-center .yzt-map-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #020810;
+}
+
+.yzt-map-land-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 401;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background:
+    radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0, 40, 80, 0.06) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(1, 8, 22, 0.12) 0%, rgba(2, 10, 28, 0.28) 100%);
+}
+
+.yzt-map-wrap[data-map-scope="land"] .yzt-map-land-veil {
+  opacity: 0;
+}
+
+.yzt-map-wrap[data-map-scope="land"] #yzt-gis-map .leaflet-tile-pane {
+  filter: none;
+}
+
+.yzt-map-land-use-legend {
+  position: absolute;
+  right: 16px;
+  bottom: 110px;
+  z-index: 520;
+  padding: 12px 14px;
+  background: rgba(8, 18, 32, 0.78);
+  border: 1px solid rgba(0, 229, 255, 0.22);
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 140px;
+}
+
+.yzt-land-use-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 36px;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.3;
+}
+
+.yzt-land-use-item .sw {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.35);
+}
+
+.yzt-farm-map-label-wrap {
+  background: transparent !important;
+  border: none !important;
+}
+
+.yzt-farm-map-label {
+  color: #fff;
+  font-size: 40px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow:
+    0 0 8px rgba(0, 0, 0, 0.95),
+    0 1px 3px rgba(0, 0, 0, 0.85),
+    0 0 20px rgba(0, 229, 255, 0.35);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* 土地资源 · 勾勒线透明 PNG（叠在底图瓦片之上） */
+.yzt-map-wrap .leaflet-image-layer.yzt-land-baseline-overlay {
+  opacity: 1 !important;
+  background: rgba(249, 243, 243, 0);
+  pointer-events: none;
+  filter:
+    drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 0 8px rgba(255, 255, 255, 0.45))
+    drop-shadow(20px 4px 80px rgba(0, 0, 0, 0.302));
+}
+
+/* 农场点位（土地资源地图） */
+.yzt-marker.yzt-farm-point {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+.yzt-marker.yzt-farm-point .yzt-farm-pin {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  pointer-events: auto;
+}
+
+.yzt-marker.yzt-farm-point .m-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+  pointer-events: none;
+}
+
+.yzt-marker.yzt-farm-point .m-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  background: #00ff88;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 14px rgba(0, 255, 136, 0.95), 0 0 4px rgba(255, 255, 255, 0.8);
+}
+
+.yzt-marker.yzt-farm-point.is-active .m-core {
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  background: #ffb800;
+  box-shadow: 0 0 16px rgba(255, 184, 0, 0.95);
+}
+
+.yzt-marker.yzt-farm-point.is-active .yzt-farm-pin .m-core {
+  transform: scale(1.2);
+}
+
+.yzt-marker.yzt-farm-point.is-dimmed {
+  opacity: 0.35;
+  filter: grayscale(0.6);
+}
+
+.yzt-marker.yzt-farm-point.is-active .m-ring {
+  border-color: rgba(255, 184, 0, 0.7);
+  box-shadow: 0 0 14px rgba(255, 184, 0, 0.55);
+}
+
+.yzt-marker.yzt-farm-point.is-dimmed .m-core {
+  background: rgba(0, 255, 136, 0.4);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: none;
+  transform: scale(0.88);
+  transition: background 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.yzt-marker.yzt-farm-point.is-dimmed .m-ring {
+  border-color: rgba(0, 255, 136, 0.2);
+  box-shadow: none;
+  opacity: 0.4;
+  transition: opacity 0.35s ease;
+}
+
+.yzt-marker.yzt-farm-point.is-active .m-core,
+.yzt-marker.yzt-farm-point.is-active .m-ring {
+  transition: background 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.yzt-marker.yzt-farm-point .m-label {
+  display: none;
+}
+
+.yzt-map-tooltip.yzt-farm-point-tip {
+  font-size: 34px;
+  font-weight: 600;
+  color: #e8fff4;
+  border-color: rgba(0, 255, 136, 0.45);
+}
+
+.yzt-left-analysis,
+.yzt-left-plot {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.yzt-right-analysis {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.yzt-right-plant-detail {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.yzt-side-charts {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yzt-side-chart {
+  flex: 1;
+  min-height: 140px;
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.yzt-side-right.yzt-mode-plant .yzt-right-analysis {
+  flex: 0 0 auto;
+}
+
+.yzt-side-right.yzt-mode-plant .yzt-right-analysis .yzt-side-charts {
+  flex: 0 0 auto;
+  min-height: 280px;
+}
+
+.yzt-side-right.yzt-mode-plant .yzt-right-analysis .yzt-side-chart {
+  flex: 1;
+  min-height: 130px;
+}
+
+.yzt-side-right.yzt-mode-analysis .yzt-right-analysis {
+  flex: 1;
+}
+
+.yzt-side-right.yzt-mode-analysis .yzt-right-plant-detail {
+  display: none !important;
+}
+
+.yzt-side-left.yzt-mode-analysis,
+.yzt-side-right.yzt-mode-analysis {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: 10px 8px;
+}
+
+.yzt-side-left.yzt-mode-analysis .yzt-left-analysis,
+.yzt-side-right.yzt-mode-analysis .yzt-right-analysis {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 0;
+}
+
+.yzt-side-left.yzt-mode-analysis .yzt-side-label,
+.yzt-side-right.yzt-mode-analysis .yzt-side-label {
+  display: none !important;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+
+/* 土地资源 · 五项数据分析：calc 固定块高，图表区有真实像素尺寸 */
+.yzt-land-chart-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--yzt-land-gap);
+  overflow: hidden;
+}
+
+.yzt-land-view-group,
+.yzt-land-view-farm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--yzt-land-gap);
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  transition: opacity 0.4s ease;
+}
+
+.yzt-side-left.yzt-mode-analysis .yzt-land-chart-list {
+  height: calc(3 * var(--yzt-land-block-h-left) + 2 * var(--yzt-land-gap));
+}
+
+.yzt-side-left.yzt-mode-analysis.yzt-land-drill .yzt-land-chart-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-view-farm .yzt-land-chart-block--farm-info-only {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-view-farm .yzt-land-chart-block--farm-info-only .yzt-land-farm-info {
+  height: auto !important;
+  min-height: 200px !important;
+  max-height: none !important;
+}
+
+/* 农场下钻左栏：三模块高度 20% : 25% : 55%（填满左侧） */
+.yzt-side-left.yzt-land-drill .yzt-land-view-farm {
+  gap: var(--yzt-land-gap);
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-view-farm > .yzt-land-drill-kpi {
+  flex: 2 1 0;
+  min-height: 0;
+  max-height: none;
+  height: auto;
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-view-farm > .yzt-land-chart-block--donut {
+  flex: 2.5 1 0;
+  min-height: 0;
+  max-height: none;
+  height: auto;
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-view-farm > .yzt-land-chart-block--waterfall {
+  flex: 5.5 1 0;
+  min-height: 0;
+  max-height: none;
+  height: auto;
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-view-farm > .yzt-land-drill-kpi .yzt-land-viz {
+  flex: 1 1 auto;
+  min-height: 100px;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-view-farm > .yzt-land-chart-block--donut .yzt-land-donut-single--farm {
+  flex: 1 1 auto;
+  min-height: 120px;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-view-farm > .yzt-land-chart-block--waterfall .yzt-land-waterfall-wrap--farm-only-chart {
+  flex: 1 1 auto;
+  min-height: 120px;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-farm-info,
+.yzt-side-left.yzt-land-drill .yzt-land-village-bars {
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-waterfall-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-waterfall-chart {
+  flex: 1 1 auto;
+  min-height: 110px !important;
+  width: 100% !important;
+}
+
+.yzt-side-right.yzt-land-drill .yzt-land-region-cards {
+  gap: 0;
+  padding: 0;
+  justify-content: flex-start;
+}
+
+.yzt-side-left.yzt-land-drill .yzt-land-view-farm:not(.yzt-hidden) {
+  display: flex !important;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.yzt-side-right.yzt-mode-analysis .yzt-land-chart-list {
+  height: calc(2 * var(--yzt-land-block-h-right) + 1 * var(--yzt-land-gap));
+}
+
+.yzt-side-right.yzt-mode-analysis.yzt-land-drill #right-charts-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.yzt-side-right.yzt-land-drill.yzt-mode-analysis .yzt-land-chart-block {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: none !important;
+  height: auto !important;
+}
+
+.yzt-side-right.yzt-land-drill.yzt-mode-analysis .yzt-land-chart-block--terrace {
+  flex: 1.08 1 0;
+}
+
+.yzt-side-right.yzt-land-drill.yzt-mode-analysis .yzt-land-chart-block--progress {
+  flex: 1 1 0;
+}
+
+/* 仅集团视图（未农场下钻）使用固定块高；下钻时由 .yzt-land-drill 专用 flex 规则接管 */
+.yzt-side-left.yzt-mode-analysis:not(.yzt-land-drill) .yzt-land-chart-block {
+  flex: 0 0 var(--yzt-land-block-h-left);
+  height: var(--yzt-land-block-h-left);
+  max-height: var(--yzt-land-block-h-left);
+}
+
+.yzt-side-right.yzt-mode-analysis:not(.yzt-land-drill) .yzt-land-chart-block {
+  flex: 0 0 var(--yzt-land-block-h-right);
+  height: var(--yzt-land-block-h-right);
+  max-height: var(--yzt-land-block-h-right);
+}
+
+.yzt-land-chart-block {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  /* 用 gap 做标题与图表间距，避免 margin 挤爆固定高度模块导致内容被 overflow 裁没 */
+  gap: 10px;
+  padding: 10px 15px;
+  background: linear-gradient(135deg, rgba(0, 40, 32, 0.55) 0%, rgba(0, 0, 0, 0.35) 100%);
+  border: 1px solid rgba(0, 80, 56, 0.55);
+  border-radius: 6px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.yzt-land-chart-head {
+  flex: 0 0 auto;
+  min-height: auto;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0;
+  overflow: visible;
+  margin-bottom: 0;
+}
+
+.yzt-land-chart-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.25;
+  padding: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 左1：农场大卡片 */
+.yzt-land-viz {
+  width: 100%;
+  height: var(--yzt-land-plot-h-left);
+  min-height: var(--yzt-land-plot-h-left);
+  max-height: var(--yzt-land-plot-h-left);
+  overflow: hidden;
+}
+
+/* 集团视图（未下钻）：图表区随网格行伸缩，避免固定像素高度 + padding/gap 超出模块被裁切 */
+.yzt-side-left.yzt-mode-analysis:not(.yzt-land-drill) .yzt-land-chart-block > .yzt-land-viz {
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+}
+
+.yzt-side-right.yzt-mode-analysis:not(.yzt-land-drill) .yzt-land-chart-block > .yzt-land-viz {
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+}
+
+.yzt-side-right.yzt-mode-analysis:not(.yzt-land-drill) .yzt-land-viz {
+  height: var(--yzt-land-plot-h-right);
+  min-height: var(--yzt-land-plot-h-right);
+  max-height: var(--yzt-land-plot-h-right);
+}
+
+/* 农场下钻：右栏图表区随块高伸缩，避免「地图·筛选统计」等子块被固定像素高 + min-height:0 挤没 */
+.yzt-side-right.yzt-land-drill.yzt-mode-analysis .yzt-land-chart-block > .yzt-land-viz {
+  height: auto !important;
+  min-height: 96px !important;
+  max-height: none !important;
+  flex: 1 1 auto;
+}
+
+.yzt-land-farm-cards {
+  display: flex;
+  gap: 8px;
+  padding: 4px 2px;
+  box-sizing: border-box;
+}
+
+.yzt-land-farm-card {
+  flex: 1;
+  min-width: 0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgba(74, 85, 104, 0.5);
+}
+
+.yzt-land-farm-card--core {
+  background: linear-gradient(145deg, rgba(0, 168, 107, 0.55) 0%, rgba(0, 80, 50, 0.35) 100%);
+}
+
+.yzt-land-farm-card--second {
+  background: linear-gradient(145deg, rgba(102, 217, 163, 0.4) 0%, rgba(0, 60, 40, 0.3) 100%);
+}
+
+.yzt-land-farm-card .farm-name {
+  font-size: 32px;
+  font-weight: 600;
+  color: #e8fff4;
+}
+
+.yzt-land-farm-card .farm-area {
+  font-family: var(--font-num);
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+
+.yzt-land-farm-card .farm-unit {
+  font-size: 26px;
+  color: rgba(230, 245, 240, 0.85);
+  margin-left: 4px;
+}
+
+.yzt-land-farm-card .farm-diff {
+  font-size: 26px;
+  color: rgba(230, 245, 255, 0.9);
+}
+
+.yzt-land-farm-card[data-farm-id] {
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.yzt-land-farm-card[data-farm-id]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 168, 107, 0.25);
+  border-color: rgba(0, 255, 180, 0.55);
+}
+
+/* 农场下钻 · 概况卡片 */
+.yzt-land-farm-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+
+.yzt-land-farm-info-name {
+  font-size: 36px;
+  font-weight: 700;
+  color: #e8fff4;
+  line-height: 1.2;
+}
+
+.yzt-land-farm-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+}
+
+.yzt-land-farm-info-item--full {
+  grid-column: 1 / -1;
+}
+
+.yzt-land-farm-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.yzt-land-farm-info-item .info-label {
+  font-size: 26px;
+  color: rgba(200, 220, 235, 0.85);
+  flex-shrink: 0;
+}
+
+.yzt-land-farm-info-item .info-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: #fff;
+  text-align: right;
+}
+
+.yzt-land-farm-info-item .info-value .num {
+  font-family: var(--font-num);
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.yzt-land-farm-info-item .info-value .unit {
+  font-size: 24px;
+  margin-left: 4px;
+  color: rgba(230, 245, 255, 0.85);
+}
+
+.yzt-land-farm-info-item .info-value--text {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+/* 农场下钻 · 行政村横向条（HTML，避免 ECharts 高度为 0） */
+.yzt-land-village-bars {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+
+.yzt-land-village-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.yzt-land-village-row .village-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.yzt-land-village-row .village-name {
+  font-size: 22px;
+  font-weight: 600;
+  color: #e8f4ff;
+}
+
+.yzt-land-village-row .village-meta {
+  font-size: 18px;
+  color: rgba(200, 220, 235, 0.9);
+  font-family: var(--font-num);
+  white-space: nowrap;
+}
+
+.yzt-land-village-bar {
+  position: relative;
+  height: 22px;
+  background: rgba(74, 85, 104, 0.35);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.yzt-land-village-bar .bar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+/* 左2：单个大尺寸环形图 */
+.yzt-land-donut-single {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.yzt-land-donut-single .yzt-land-donut-chart {
+  width: 100%;
+  height: 100%;
+}
+
+/* 左3：大数字 + 瀑布 */
+.yzt-land-waterfall-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px 0;
+  box-sizing: border-box;
+}
+
+.yzt-land-hero-rate {
+  flex: 0 0 auto;
+  text-align: center;
+  padding: 4px 8px 2px;
+}
+
+.yzt-land-hero-rate .hero-label {
+  font-size: 30px;
+  font-weight: 700;
+  color: #fff;
+  margin-right: 12px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}
+
+.yzt-land-hero-rate .hero-value {
+  font-family: var(--font-num);
+  font-size: 60px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.yzt-land-waterfall-chart {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* 右1：宗地类型分层梯田占比 */
+.yzt-land-terrace-chart {
+  background: rgba(0, 6, 14, 0.4);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.yzt-land-terrace {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.yzt-land-terrace-tier {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  box-sizing: border-box;
+  box-shadow: inset 0 -1px 0 #ffffff;
+}
+
+.yzt-land-terrace-tier:last-child {
+  box-shadow: none;
+}
+
+.yzt-land-terrace-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.12em;
+  padding: 6px 8px;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1.15;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  max-width: 100%;
+}
+
+.yzt-land-terrace-name {
+  font-size: clamp(18px, 2.8vmin, 36px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.yzt-land-terrace-area,
+.yzt-land-terrace-pct {
+  font-size: clamp(16px, 2.2vmin, 30px);
+  font-weight: 700;
+}
+
+.yzt-land-terrace-tier--compact .yzt-land-terrace-name {
+  font-size: clamp(16px, 2vmin, 26px);
+}
+
+.yzt-land-terrace-tier--compact .yzt-land-terrace-area,
+.yzt-land-terrace-tier--compact .yzt-land-terrace-pct {
+  font-size: clamp(16px, 1.75vmin, 22px);
+}
+
+.yzt-land-terrace-num {
+  font-family: var(--font-num);
+  font-weight: 700;
+  font-size: 1.08em;
+}
+
+.yzt-land-terrace-unit {
+  font-weight: 700;
+  font-size: 0.92em;
+  opacity: 0.95;
+}
+
+/* 右2：进度条卡片 */
+.yzt-land-region-cards {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 8px 6px;
+  box-sizing: border-box;
+}
+
+.yzt-land-region-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yzt-land-region-card .region-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.yzt-land-region-card .region-name {
+  font-size: 26px;
+  font-weight: 600;
+  color: #e8f4ff;
+}
+
+.yzt-land-region-card .region-area {
+  font-size: 22px;
+  color: rgba(200, 220, 235, 0.9);
+  font-family: var(--font-num);
+}
+
+.yzt-land-region-bar {
+  position: relative;
+  height: 36px;
+  background: rgba(74, 85, 104, 0.35);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.yzt-land-region-bar .bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.35s ease;
+}
+
+.yzt-land-region-bar .bar-fill--core {
+  background: linear-gradient(90deg, var(--yzt-c-core), #00c97f);
+}
+
+.yzt-land-region-bar .bar-fill--second {
+  background: linear-gradient(90deg, var(--yzt-c-second), #7ee0b0);
+}
+
+.yzt-land-region-bar .bar-rate {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.yzt-side-left.yzt-mode-analysis .yzt-land-chart-block .yzt-side-chart {
+  width: 100%;
+  height: var(--yzt-land-plot-h-left);
+  min-height: var(--yzt-land-plot-h-left);
+  max-height: var(--yzt-land-plot-h-left);
+  flex: none;
+  background: rgba(0, 8, 18, 0.45);
+}
+
+.yzt-side-right.yzt-mode-analysis .yzt-land-chart-block .yzt-side-chart {
+  width: 100%;
+  height: var(--yzt-land-plot-h-right);
+  min-height: var(--yzt-land-plot-h-right);
+  max-height: var(--yzt-land-plot-h-right);
+  flex: none;
+  background: rgba(0, 8, 18, 0.45);
+}
+
+.yzt-side-left.yzt-mode-analysis .yzt-iot-charts,
+.yzt-side-right.yzt-mode-analysis .yzt-iot-charts {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.yzt-side-left.yzt-mode-analysis .yzt-iot-charts .yzt-side-chart,
+.yzt-side-right.yzt-mode-analysis .yzt-iot-charts .yzt-side-chart {
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.yzt-side-left.yzt-mode-plant .yzt-left-plot {
+  display: flex;
+}
+
+/* 右栏 KPI + 图表 + 明细 */
+.yzt-kpi-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.yzt-kpi-card {
+  padding: 12px 10px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  text-align: center;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.yzt-kpi-card .k-label {
+  font-size: 40px;
+  color: var(--text-secondary);
+}
+
+.yzt-kpi-card .k-val {
+  font-size: 50px;
+  font-family: var(--font-num);
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+.yzt-kpi-card .k-val.green { color: var(--accent-green); }
+
+.yzt-right-charts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.yzt-right-chart {
+  width: 100%;
+  height: 200px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(0, 255, 160, 0.12);
+  border-radius: 6px;
+}
+
+.yzt-detail-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+
+.yzt-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(0, 255, 160, 0.12);
+  border-radius: 4px;
+  font-size: 38px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.15s;
+  min-height: 48px;
+}
+
+.yzt-detail-row:hover {
+  background: rgba(0, 255, 136, 0.06);
+  border-color: rgba(0, 255, 136, 0.25);
+}
+
+.yzt-detail-row .dr-main { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.yzt-detail-row .dr-sub { font-size: 46px; color: var(--text-secondary); flex-shrink: 0; }
+
+/* 地图浮层 Tab：土地资源 | 物联网设备 | 种植经营 */
+.yzt-tabbar.yzt-map-tabbar {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 925;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 10px 20px;
+  height: auto;
+  border: none;
+  border-radius: 10px;
+  background: rgba(6, 16, 28, 0.42);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  pointer-events: auto;
+}
+
+.yzt-map-wrap.weather-active .yzt-map-tabbar {
+  bottom: 78px;
+}
+
+.yzt-bottom-tab {
+  min-width: 280px;
+  min-height: 72px;
+  padding: 16px 48px;
+  font-size: 52px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.yzt-bottom-tab:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.yzt-bottom-tab.active {
+  color: rgba(220, 255, 240, 0.98);
+  border-color: rgba(0, 200, 120, 0.95);
+  background: linear-gradient(180deg, rgba(0, 110, 72, 0.72) 0%, rgba(0, 48, 32, 0.88) 100%);
+  font-weight: 800;
+  box-shadow: 0 0 24px rgba(0, 255, 160, 0.22), inset 0 1px 0 rgba(0, 255, 180, 0.12);
+}
+
+/* ===== 主体三栏（旧，保留兼容） ===== */
+.yzt-main {
+  height: var(--yzt-body-h);
+  display: flex;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.yzt-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-right: none;
+  background: var(--bg-panel);
+  overflow: hidden;
+}
+
+.yzt-panel:last-child { border-right: none; }
+
+.yzt-panel-left { width: var(--yzt-col-left); flex-shrink: 0; }
+.yzt-panel-center {
+  width: var(--yzt-col-center);
+  flex-shrink: 0;
+  border-right: none;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* 地图筛选 · 透明浮层（全部展开，无标题无滚动） */
+.yzt-map-float-panel,
+.yzt-map-filter-bar {
+  position: absolute;
+  top: 16px;
+  right: 72px;
+  left: auto;
+  width: max-content;
+  max-width: calc(100% - 120px);
+  z-index: 920;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: rgba(6, 16, 28, 0.28);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: none;
+  border-radius: 8px;
+  box-shadow: none;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+.yzt-map-wrap[data-map-scope="land"] .leaflet-overlay-pane svg path {
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.yzt-map-wrap[data-map-scope="land"] .leaflet-overlay-pane svg path.yzt-farm-parcel-path {
+  stroke: #ffffff;
+  stroke-width: 1;
+  cursor: pointer;
+  transition: stroke-width 0.15s ease, fill-opacity 0.15s ease;
+}
+
+/* 土地资源：筛选图例右上（避让地图工具栏） */
+.yzt-map-wrap[data-map-scope="land"] .yzt-map-filter-bar {
+  left: auto;
+  right: 72px;
+}
+
+/* 地图右下角 · 地块交互提示 */
+.yzt-map-parcel-click-hint {
+  position: absolute;
+  right: 16px;
+  bottom: 198px;
+  z-index: 1185;
+  font-size: 14px;
+  line-height: 1.35;
+  color: rgba(200, 215, 230, 0.72);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+  letter-spacing: 0.04em;
+}
+
+.yzt-map-parcel-click-hint.yzt-hidden {
+  display: none;
+}
+
+.yzt-map-wrap.weather-active .yzt-map-parcel-click-hint {
+  bottom: 256px;
+}
+
+.yzt-map-wrap.yzt-farm-drill-active .yzt-map-parcel-legend {
+  left: auto;
+  right: 72px;
+  top: 96px;
+}
+
+.yzt-map-wrap.yzt-farm-drill-active .leaflet-overlay-pane svg path.yzt-farm-parcel-path:hover {
+  stroke-width: 2;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.55));
+}
+
+.leaflet-tooltip.yzt-parcel-hover-tip {
+  background: rgba(4, 18, 32, 0.94);
+  border: 1px solid rgba(0, 255, 180, 0.42);
+  border-radius: 6px;
+  padding: 0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  color: var(--text-primary);
+}
+
+.leaflet-tooltip.yzt-parcel-hover-tip::before {
+  border-top-color: rgba(0, 255, 180, 0.42);
+}
+
+.yzt-parcel-hover-card {
+  padding: 10px 14px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.yzt-parcel-hover-card .yzt-parcel-hover-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-green);
+  margin-bottom: 2px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(0, 255, 160, 0.2);
+}
+
+.yzt-parcel-hover-card .yzt-parcel-hover-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 28px;
+  line-height: 1.35;
+}
+
+.yzt-parcel-hover-card .yzt-parcel-hover-row .k {
+  color: rgba(170, 210, 240, 0.75);
+  flex-shrink: 0;
+}
+
+.yzt-parcel-hover-card .yzt-parcel-hover-row .v {
+  color: #e8f4ff;
+  text-align: right;
+  font-family: var(--font-num);
+}
+
+.yzt-parcel-hover-row .v.is-warn {
+  color: #FF9F1C;
+}
+
+.yzt-map-wrap[data-map-scope="plant"] .leaflet-overlay-pane svg path {
+  stroke-linejoin: miter;
+  stroke-linecap: butt;
+}
+
+.yzt-map-wrap[data-map-scope="plant"] .leaflet-overlay-pane svg path.yzt-plot-parcel {
+  stroke: #00ff88;
+  stroke-width: 2;
+  fill: rgba(0, 255, 120, 0.12);
+  filter: drop-shadow(0 0 2px rgba(0, 255, 136, 0.45));
+  cursor: pointer;
+}
+
+.yzt-plot-map-label-wrap {
+  background: transparent !important;
+  border: none !important;
+}
+
+.yzt-plot-map-label {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(0, 72, 36, 0.88);
+  border: 1px solid rgba(0, 255, 136, 0.55);
+  border-radius: 3px;
+  color: #fff;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.yzt-plot-crop-icon-wrap {
+  background: transparent !important;
+  border: none !important;
+}
+
+.yzt-plot-crop-icon {
+  width: 22px;
+  height: 22px;
+  transform: rotate(45deg) scale(1.6);
+  transform-origin: center center;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(255, 220, 80, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.45);
+}
+
+.yzt-plot-crop-icon span {
+  display: block;
+  width: 10px;
+  height: 10px;
+  transform: rotate(-45deg);
+  background: center / contain no-repeat;
+}
+
+.yzt-plot-crop-icon.crop-corn span {
+  background-image: radial-gradient(circle, #ffd54f 30%, transparent 32%), linear-gradient(#ffd54f, #ffb300);
+  border-radius: 50% 50% 40% 40%;
+}
+
+.yzt-plot-crop-icon.crop-soy span {
+  background: radial-gradient(circle at 30% 35%, #c5e17a 2px, transparent 3px),
+    radial-gradient(circle at 60% 55%, #aed581 2px, transparent 3px),
+    radial-gradient(circle at 45% 70%, #9ccc65 2px, transparent 3px);
+}
+
+.yzt-plot-crop-icon.crop-rice span {
+  background: linear-gradient(180deg, #81c784 0%, #66bb6a 100%);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.yzt-plot-crop-icon.crop-grain span,
+.yzt-plot-crop-icon.crop-grass span,
+.yzt-plot-crop-icon.crop-other span {
+  background: linear-gradient(180deg, #ffd54f, #ff8f00);
+  border-radius: 50%;
+}
+
+.yzt-plot-crop-icon.crop-fruit span {
+  background: radial-gradient(circle, #ff8a80 45%, #e53935 46%);
+  border-radius: 50%;
+}
+
+.yzt-plot-crop-icon.crop-livestock span {
+  background: linear-gradient(180deg, #ce93d8, #8e24aa);
+  border-radius: 50%;
+}
+
+.yzt-mode-tab-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.yzt-mode-tab-group.yzt-hidden {
+  display: none;
+}
+
+.yzt-map-filter-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  overflow: visible;
+  background: transparent;
+}
+
+.yzt-map-legend-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.yzt-legend-filter-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.yzt-legend-filter-row:has(.yzt-map-mode-legend:empty) {
+  display: none;
+}
+
+.yzt-legend-group-label {
+  flex-shrink: 0;
+  min-width: 5.5em;
+  padding-top: 6px;
+  font-size: 28px;
+  font-weight: 500;
+  color: rgba(120, 210, 255, 0.92);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.yzt-map-mode-legend:empty {
+  display: none;
+}
+
+.yzt-map-mode-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  flex: 1;
+  align-items: center;
+  padding-top: 2px;
+}
+
+.yzt-map-mode-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.yzt-mode-tab {
+  padding: 6px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.16);
+  color: rgba(170, 210, 240, 0.82);
+  font-size: 28px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.yzt-mode-tab:hover {
+  border-color: rgba(0, 212, 255, 0.45);
+  color: var(--accent-cyan);
+  background: rgba(0, 212, 255, 0.08);
+}
+
+.yzt-mode-tab.active {
+  border-color: rgba(0, 255, 136, 0.55);
+  background: rgba(0, 255, 136, 0.12);
+  color: var(--accent-green);
+  box-shadow: none;
+}
+
+.yzt-map-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ===== 自定义下拉（与图例筛选面板统一） ===== */
+.yzt-select {
+  position: relative;
+  min-width: 132px;
+  flex-shrink: 0;
+}
+
+.yzt-map-filter-bar .yzt-select { min-width: 128px; }
+
+.yzt-select-header { min-width: 168px; }
+.yzt-select-footer { min-width: 200px; }
+
+.yzt-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 14px;
+  border: 1px solid rgba(0, 255, 160, 0.22);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--text-secondary);
+  font-size: 40px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1.3;
+  text-align: left;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.yzt-select-trigger:hover {
+  border-color: rgba(0, 212, 255, 0.45);
+  color: var(--accent-cyan);
+  background: rgba(0, 212, 255, 0.06);
+}
+
+.yzt-select.open .yzt-select-trigger {
+  border-color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.12);
+  color: var(--accent-green);
+  box-shadow: 0 0 14px rgba(0, 255, 136, 0.15);
+}
+
+.yzt-select-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.yzt-select-text.is-placeholder { color: var(--text-secondary); }
+
+.yzt-select:not(.open) .yzt-select-text:not(.is-placeholder) {
+  color: var(--text-primary);
+}
+
+.yzt-select-arrow {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--accent-cyan);
+  transition: transform 0.25s;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.yzt-select.open .yzt-select-arrow {
+  transform: rotate(180deg);
+  border-top-color: var(--accent-green);
+}
+
+.yzt-select-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 100%;
+  width: max-content;
+  min-width: 160px;
+  max-height: 280px;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  background: #0a1828;
+  border: 1px solid rgba(0, 255, 160, 0.32);
+  border-radius: 6px;
+  box-shadow:
+    0 10px 32px rgba(0, 0, 0, 0.65),
+    0 0 20px rgba(0, 255, 136, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  z-index: 960;
+}
+
+.yzt-select.open .yzt-select-dropdown {
+  display: flex;
+  animation: yzt-drop-in 0.18s ease;
+}
+
+@keyframes yzt-drop-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.yzt-map-filter-bar .yzt-select.open { z-index: 980; }
+
+.yzt-select-dropdown-head {
+  padding: 8px 14px 8px 12px;
+  font-size: 38px;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  background: rgba(0, 255, 136, 0.06);
+  border-bottom: 1px solid rgba(0, 255, 160, 0.18);
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+  border-left: 3px solid var(--accent-green);
+  padding-left: 10px;
+}
+
+.yzt-map-filter-bar .yzt-select-trigger {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 28px;
+  padding: 7px 12px;
+}
+
+.yzt-map-filter-bar .yzt-select-dropdown {
+  background: rgba(8, 18, 32, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-color: rgba(0, 212, 255, 0.22);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+.yzt-map-filter-bar .yzt-select-dropdown-head {
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 28px;
+}
+
+.yzt-map-filter-bar .yzt-select-option {
+  font-size: 28px;
+}
+
+.yzt-select-options {
+  overflow-y: auto;
+  max-height: 220px;
+  padding: 4px 0;
+}
+
+.yzt-select-options::-webkit-scrollbar { width: 4px; }
+.yzt-select-options::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 136, 0.35);
+  border-radius: 2px;
+}
+
+.yzt-select-option {
+  padding: 9px 14px 9px 16px;
+  font-size: 40px;
+  color: rgba(170, 210, 240, 0.85);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  border-left: 3px solid transparent;
+  white-space: nowrap;
+  background: transparent;
+}
+
+.yzt-select-option:hover {
+  background: rgba(0, 255, 136, 0.08);
+  color: var(--text-primary);
+  border-left-color: rgba(0, 255, 136, 0.5);
+}
+
+.yzt-select-option.selected {
+  color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.12);
+  border-left-color: var(--accent-green);
+  font-weight: 500;
+}
+
+.yzt-select-option[data-value=""] {
+  color: var(--text-secondary);
+  font-style: normal;
+}
+
+.yzt-select-header .yzt-select-trigger {
+  font-size: var(--fs-xs);
+  padding: 8px 14px;
+}
+
+.yzt-select-footer .yzt-select-trigger {
+  border-color: rgba(0, 212, 255, 0.35);
+  color: var(--accent-cyan);
+  font-size: var(--fs-xs);
+  padding: 10px 16px;
+}
+
+.yzt-select-footer.open .yzt-select-trigger,
+.yzt-select-footer .yzt-select.open .yzt-select-trigger {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 212, 255, 0.1);
+}
+
+.yzt-filter-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 140px;
+  max-width: 200px;
+}
+
+.yzt-input-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 38px;
+  color: var(--accent-cyan);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.yzt-filter-input {
+  width: 100%;
+  padding: 7px 12px 7px 32px;
+  font-size: 40px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0, 255, 160, 0.22);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.yzt-filter-input::placeholder { color: rgba(170, 210, 240, 0.45); }
+
+.yzt-filter-input:hover {
+  border-color: rgba(0, 212, 255, 0.45);
+}
+
+.yzt-filter-input:focus {
+  outline: none;
+  border-color: var(--accent-green);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+  background: rgba(0, 255, 136, 0.04);
+}
+
+.yzt-mf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 18px;
+  border: 1px solid var(--border-cyan);
+  border-radius: 4px;
+  background: rgba(0, 212, 255, 0.08);
+  color: var(--accent-cyan);
+  font-size: 40px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.yzt-mf-btn .yzt-btn-icon { font-size: 38px; }
+
+.yzt-mf-btn:hover {
+  background: rgba(0, 212, 255, 0.18);
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.15);
+}
+
+.yzt-map-filter-bar .yzt-filter-input,
+.yzt-map-filter-bar .yzt-mf-btn {
+  background: rgba(0, 0, 0, 0.18);
+  border-color: rgba(255, 255, 255, 0.12);
+  font-size: 28px;
+}
+
+.yzt-legend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 26px;
+  color: rgba(234, 246, 255, 0.82);
+  font-family: var(--font-ui);
+}
+
+.yzt-legend-chip.filter-chip {
+  cursor: pointer;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.16);
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.yzt-legend-chip.filter-chip:hover {
+  border-color: rgba(0, 212, 255, 0.45);
+  color: var(--accent-cyan);
+}
+
+.yzt-legend-chip.filter-chip.active {
+  border-color: rgba(0, 255, 136, 0.55);
+  background: rgba(0, 255, 136, 0.12);
+  color: var(--accent-green);
+}
+
+.yzt-legend-chip .sw {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.yzt-legend-chip.border-style .sw {
+  background: transparent;
+  border-width: 2px;
+  border-style: solid;
+  width: 18px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.yzt-panel-center .yzt-map-wrap {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  background: #020810;
+}
+
+.yzt-panel-right { width: var(--yzt-col-right); flex-shrink: 0; }
+
+.yzt-panel-header {
+  padding: 14px 20px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--accent-green);
+  border-bottom: none;
+  background: rgba(0, 255, 136, 0.04);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.yzt-panel-header .icon { font-size: var(--fs-xs); opacity: 0.8; }
+
+.yzt-panel-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.yzt-panel-scroll::-webkit-scrollbar { width: 5px; }
+.yzt-panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 136, 0.3);
+  border-radius: 3px;
+}
+
+/* 模块卡片 */
+.yzt-module {
+  background: var(--bg-card);
+  border: none;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.yzt-module-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  border-bottom: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.yzt-module-head:hover { color: var(--accent-green); }
+
+.yzt-module-head .arrow { font-size: var(--fs-xs); transition: transform 0.2s; }
+.yzt-module.collapsed .yzt-module-body { display: none; }
+.yzt-module.collapsed .arrow { transform: rotate(-90deg); }
+
+.yzt-module-body { padding: 12px 14px; }
+
+.yzt-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.yzt-stat-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+.yzt-stat-card {
+  padding: 10px 12px;
+  background: rgba(0, 255, 136, 0.05);
+  border: none;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.yzt-stat-card .label {
+  font-size: 38px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.yzt-stat-card .value {
+  font-family: var(--font-num);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+.yzt-stat-card .value.green { color: var(--accent-green); }
+.yzt-stat-card .value.yellow { color: var(--accent-yellow); }
+
+.yzt-mini-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.yzt-mini-filter select {
+  flex: 1;
+  min-width: 80px;
+  padding: 4px 8px;
+  font-size: 38px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+}
+
+.yzt-chart-sm { width: 100%; height: 180px; }
+.yzt-chart-md { width: 100%; height: 220px; }
+.yzt-chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.yzt-rent-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yzt-rent-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.yzt-rent-item .bar-wrap {
+  flex: 1;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.yzt-rent-item .bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.4s;
+}
+
+.yzt-rent-item .lbl { font-size: 38px; color: var(--text-secondary); min-width: 56px; }
+.yzt-rent-item .val { font-size: 38px; font-family: var(--font-num); color: var(--accent-cyan); min-width: 72px; text-align: right; }
+
+/* ===== 中间地图 2304×1440 ===== */
+#yzt-gis-map {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  background: #1a2838;
+}
+
+.yzt-map-toolbar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 910;
+}
+
+.yzt-map-tool {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(6, 16, 28, 0.42);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--accent-green);
+  font-size: 34px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.yzt-map-tool:hover {
+  background: rgba(0, 255, 136, 0.12);
+  border-color: rgba(0, 255, 136, 0.4);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+}
+
+/* 土地资源下钻 · 地图权籍图例（随下钻移至右上） */
+.yzt-map-parcel-legend {
+  position: absolute;
+  left: 16px;
+  top: 96px;
+  z-index: 905;
+  min-width: 200px;
+  max-width: min(360px, 24vw);
+  padding: 12px 14px 14px;
+  background: rgba(6, 16, 28, 0.55);
+  border: 1px solid rgba(0, 229, 255, 0.28);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+  pointer-events: none;
+}
+
+.yzt-map-parcel-legend-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: rgba(200, 230, 255, 0.92);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.yzt-map-parcel-legend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yzt-map-parcel-legend-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  color: rgba(220, 235, 250, 0.92);
+}
+
+.yzt-map-parcel-legend-swatch {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+.yzt-land-chart-head--stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.yzt-land-chart-sub {
+  font-size: 22px;
+  line-height: 1.35;
+  color: rgba(180, 210, 235, 0.88);
+  font-weight: 400;
+}
+
+/* 土地资源 · 筛选统计（地图右下角竖向，与左右栏数据分析并存） */
+.yzt-map-land-stats {
+  position: absolute;
+  right: 16px;
+  bottom: 110px;
+  left: auto;
+  top: auto;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 220px;
+  max-width: min(420px, 28vw);
+  padding: 12px 16px 14px;
+  background: rgba(6, 16, 28, 0.55);
+  border: 1px solid rgba(0, 229, 255, 0.28);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border-radius: 8px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.yzt-land-stats-head {
+  font-size: 26px;
+  font-weight: 600;
+  color: rgba(200, 230, 255, 0.92);
+  letter-spacing: 1px;
+  padding-bottom: 4px;
+  margin-bottom: 2px;
+  border-bottom: none;
+}
+
+.yzt-map-land-stats.hidden {
+  display: none;
+}
+
+.yzt-land-stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.yzt-land-stats-label {
+  font-size: 28px;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.yzt-land-stats-val {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.yzt-land-stats-slash {
+  font-size: 26px;
+  color: rgba(160, 200, 230, 0.45);
+}
+
+.yzt-land-stats-num {
+  font-size: 32px;
+  font-family: var(--font-num);
+  font-weight: 600;
+  color: var(--accent-green);
+  line-height: 1.1;
+}
+
+.yzt-land-stats-unit {
+  font-size: 26px;
+  color: var(--text-secondary);
+}
+
+.yzt-land-stats-sep {
+  display: block;
+  height: 1px;
+  margin: 6px 0 4px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 212, 255, 0.35) 20%,
+    rgba(0, 255, 136, 0.28) 50%,
+    rgba(0, 212, 255, 0.35) 80%,
+    transparent
+  );
+  border: none;
+  flex-shrink: 0;
+}
+
+.yzt-map-wrap.weather-active .yzt-map-land-stats {
+  bottom: 168px;
+}
+
+/* 地图浮层：气象监测（底部横向通栏） */
+.yzt-map-weather-float {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  width: auto;
+  z-index: 890;
+  background: rgba(4, 14, 26, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 212, 255, 0.08);
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.yzt-map-weather-float.hidden { display: none; }
+
+.yzt-weather-float-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 16px 0 0;
+  min-height: 54px;
+}
+
+.yzt-weather-float-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 12px 16px;
+  background: rgba(0, 212, 255, 0.08);
+  border-right: 1px solid rgba(0, 212, 255, 0.22);
+  font-size: 40px;
+  color: var(--accent-cyan);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.yzt-weather-float-close {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 46px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.yzt-weather-float-close:hover {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+.yzt-weather-float-scope {
+  flex-shrink: 0;
+  padding: 0 16px;
+  font-size: 38px;
+  color: var(--accent-cyan);
+  white-space: nowrap;
+  border-right: 1px solid rgba(0, 212, 255, 0.15);
+  line-height: 54px;
+}
+
+.yzt-weather-float-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  padding: 8px 16px;
+  min-width: 0;
+}
+
+.yzt-weather-float-item {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 5px 12px;
+  background: rgba(0, 212, 255, 0.06);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 212, 255, 0.12);
+  white-space: nowrap;
+}
+
+.yzt-weather-float-item .wf-val {
+  font-family: var(--font-num);
+  font-size: 40px;
+  color: var(--accent-cyan);
+  line-height: 1.2;
+}
+
+.yzt-weather-float-item .wf-lbl {
+  font-size: 46px;
+  color: var(--text-secondary);
+}
+
+.yzt-weather-forecast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 8px 0 8px 16px;
+  border-left: 1px solid rgba(0, 212, 255, 0.22);
+  overflow: visible;
+}
+
+.yzt-weather-forecast-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 5px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 46px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.yzt-weather-forecast-item .fd {
+  color: var(--text-primary);
+  font-size: 36px;
+}
+
+.yzt-weather-forecast-item .ft {
+  color: var(--accent-cyan);
+  font-family: var(--font-num);
+  font-size: 38px;
+}
+
+.yzt-weather-forecast-item .fw {
+  color: var(--text-secondary);
+  font-size: 46px;
+}
+
+/* 灾害预警地块高亮 */
+.yzt-marker.warn.level-yellow .m-core { background: #FFB800; box-shadow: 0 0 14px #FFB800; }
+.yzt-marker.warn.level-blue .m-core { background: #00D4FF; box-shadow: 0 0 14px #00D4FF; }
+.yzt-marker.warn.level-orange .m-core { background: #FF6B6B; box-shadow: 0 0 14px #FF6B6B; }
+.yzt-marker.warn.level-red .m-core { background: #FF2222; box-shadow: 0 0 14px #FF2222; }
+
+.yzt-disaster-popup .leaflet-popup-content-wrapper {
+  background: rgba(4, 14, 26, 0.95);
+  border: 1px solid rgba(255, 107, 107, 0.5);
+  color: var(--text-primary);
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(255, 0, 0, 0.2);
+}
+
+.yzt-disaster-popup .leaflet-popup-tip { background: rgba(4, 14, 26, 0.95); }
+
+.yzt-detail-row .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.yzt-detail-row .status-dot.on { background: var(--accent-green); }
+.yzt-detail-row .status-dot.off { background: #FF6B6B; }
+
+.yzt-empty-hint {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 38px;
+}
+
+.yzt-module.filter-active .yzt-module-head {
+  color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.06);
+}
+
+/* 地图标记 */
+.yzt-marker {
+  background: none !important;
+  border: none !important;
+}
+
+.yzt-marker .m-core {
+  width: 14px;
+  height: 14px;
+  background: var(--accent-green);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--accent-green);
+  margin: 0 auto;
+}
+
+.yzt-marker.offline .m-core { background: #FF6B6B; box-shadow: 0 0 12px #FF6B6B; }
+
+.yzt-marker .m-label {
+  display: block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  background: rgba(4, 14, 26, 0.92);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 46px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.yzt-marker.device .m-core { width: 12px; height: 12px; }
+
+.yzt-marker.warn .m-core {
+  background: #FF4444;
+  animation: yzt-blink 1s infinite;
+}
+
+@keyframes yzt-blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* 右栏 */
+.yzt-progress-item { margin-bottom: 10px; }
+
+.yzt-progress-item .p-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 38px;
+  margin-bottom: 4px;
+}
+
+.yzt-progress-item .p-head .name { color: var(--text-secondary); }
+.yzt-progress-item .p-head .pct { color: var(--accent-green); font-family: var(--font-num); }
+
+.yzt-progress-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.yzt-progress-bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+  border-radius: 4px;
+  transition: width 0.4s;
+}
+
+.yzt-weather-now {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.yzt-weather-item {
+  text-align: center;
+  padding: 8px;
+  background: rgba(0, 212, 255, 0.06);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 212, 255, 0.15);
+}
+
+.yzt-weather-item .w-val {
+  font-family: var(--font-num);
+  font-size: var(--fs-sm);
+  color: var(--accent-cyan);
+}
+
+.yzt-weather-item .w-lbl { font-size: 38px; color: var(--text-secondary); margin-top: 2px; }
+
+.yzt-farm-list { display: flex; flex-direction: column; gap: 6px; }
+
+.yzt-farm-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(0, 255, 136, 0.04);
+  border: 1px solid rgba(0, 255, 160, 0.1);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 40px;
+  transition: all 0.2s;
+}
+
+.yzt-farm-row:hover {
+  border-color: var(--accent-green);
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.yzt-farm-row .area { color: var(--accent-cyan); font-family: var(--font-num); font-size: 38px; }
+
+.yzt-device-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  font-size: 38px;
+}
+
+.yzt-device-row:hover { background: rgba(0, 255, 136, 0.06); }
+
+.yzt-device-row .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.yzt-device-row .status-dot.on { background: var(--accent-green); }
+.yzt-device-row .status-dot.off { background: #FF6B6B; }
+
+/* ===== 底部通栏 3840×240 ===== */
+.yzt-footer {
+  height: var(--yzt-footer-h);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  gap: 24px;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(0deg, rgba(0, 50, 40, 0.4) 0%, transparent 100%);
+  flex-shrink: 0;
+}
+
+.yzt-ticker-wrap {
+  flex: 1;
+  overflow: hidden;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.yzt-ticker {
+  display: flex;
+  white-space: nowrap;
+  animation: yzt-scroll 40s linear infinite;
+}
+
+.yzt-ticker:hover { animation-play-state: paused; }
+
+.yzt-ticker-item {
+  padding: 0 48px;
+  font-size: 44px;
+  color: var(--text-secondary);
+}
+
+.yzt-ticker-item.disaster { color: #FF9F43; }
+.yzt-ticker-item.device { color: #FF6B6B; }
+
+@keyframes yzt-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.yzt-footer-locate { flex-shrink: 0; }
+
+.yzt-legend-btn {
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: rgba(0, 255, 136, 0.08);
+  color: var(--accent-green);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+}
+
+.yzt-legend-btn:hover { background: rgba(0, 255, 136, 0.15); }
+
+/* ===== 筛选面板 ===== */
+.yzt-filter-panel {
+  position: absolute;
+  top: var(--yzt-header-h);
+  right: 0;
+  width: 420px;
+  height: calc(var(--yzt-main-h));
+  background: rgba(4, 14, 26, 0.98);
+  border-left: 1px solid var(--border-cyan);
+  z-index: 9000;
+  transform: translateX(100%);
+  transition: transform 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.yzt-filter-panel.open { transform: translateX(0); }
+
+.yzt-filter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-sm);
+  color: var(--accent-cyan);
+}
+
+.yzt-filter-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.yzt-filter-group label {
+  display: block;
+  font-size: 40px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.yzt-filter-group select,
+.yzt-filter-group input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 40px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+}
+
+.yzt-filter-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.yzt-filter-actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+
+.yzt-btn-primary {
+  background: rgba(0, 255, 136, 0.15);
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+}
+
+.yzt-btn-secondary {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+/* ===== 弹窗 ===== */
+.yzt-modal-overlay {
+  position: absolute;
+  inset: 0;
+  width: var(--dash-w);
+  height: var(--dash-h);
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(6px);
+}
+
+.yzt-modal-overlay.hidden { display: none; }
+
+.yzt-modal {
+  width: 880px;
+  max-height: 640px;
+  background: linear-gradient(180deg, #0a1828, #060e18);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(0, 255, 136, 0.12);
+}
+
+.yzt-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.yzt-modal-header h2 { font-size: var(--fs-md); color: var(--accent-green); }
+.yzt-modal-header p { font-size: 40px; color: var(--text-secondary); margin-top: 4px; }
+
+.yzt-modal-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-secondary);
+  font-size: 44px;
+  cursor: pointer;
+}
+
+.yzt-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.yzt-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.yzt-modal-card {
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.yzt-modal-card h3 {
+  font-size: 44px;
+  color: var(--accent-green);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.yzt-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.yzt-info-row .lbl { color: var(--text-secondary); }
+.yzt-info-row .val { color: var(--text-primary); font-weight: 500; }
+.yzt-info-row .val.hl { color: var(--accent-cyan); font-family: var(--font-num); }
+
+.profile-text { font-size: 40px; line-height: 1.85; color: var(--text-secondary); }
+
+.yzt-modal-card.full { grid-column: 1 / -1; }
+
+.yzt-device-ctrl {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.yzt-device-ctrl button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 44px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  border: 1px solid var(--accent-green);
+  background: rgba(0, 255, 136, 0.12);
+  color: var(--accent-green);
+}
+
+.yzt-device-ctrl button.off {
+  border-color: #FF6B6B;
+  background: rgba(255, 107, 107, 0.12);
+  color: #FF6B6B;
+}
+
+/* 图例弹窗 */
+.yzt-legend-modal .yzt-modal { width: 720px; max-height: 560px; }
+
+.yzt-legend-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.yzt-legend-section h4 {
+  font-size: 44px;
+  color: var(--accent-cyan);
+  margin-bottom: 10px;
+}
+
+.yzt-legend-items { display: flex; flex-direction: column; gap: 6px; }
+
+.yzt-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 40px;
+  color: var(--text-secondary);
+}
+
+.yzt-legend-item .swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.yzt-context-menu {
+  position: fixed;
+  z-index: 12000;
+  background: rgba(4, 14, 26, 0.98);
+  border: 1px solid var(--accent-green);
+  border-radius: 4px;
+  padding: 6px 0;
+  min-width: 160px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+.yzt-context-menu.show { display: block; }
+
+.yzt-context-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 40px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+
+.yzt-context-menu button:hover { background: rgba(0, 255, 136, 0.1); color: var(--accent-green); }
+
+/* 拼接缝避让 — 内容距边缘留白 */
+.leaflet-tooltip.yzt-map-tooltip {
+  background: rgba(4, 14, 26, 0.95);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 38px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* 土地资源下钻 · 地块悬停信息卡片 */
+.leaflet-tooltip.yzt-parcel-hover-tooltip {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.yzt-parcel-hover-card {
+  min-width: 380px;
+  padding: 18px 22px;
+  background: rgba(4, 14, 26, 0.94);
+  border: 1px solid rgba(0, 229, 255, 0.45);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  font-size: 34px;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.yzt-parcel-hover-title {
+  font-weight: 700;
+  color: #e8f4ff;
+  margin-bottom: 14px;
+  font-size: 36px;
+  letter-spacing: 0.5px;
+}
+
+.yzt-parcel-hover-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.yzt-parcel-hover-row .k {
+  color: rgba(200, 230, 255, 0.72);
+  flex-shrink: 0;
+}
+
+.yzt-parcel-hover-row .v {
+  color: #f0fafc;
+  text-align: right;
+}
+
+path.yzt-land-drill-parcel {
+  stroke: #ffffff !important;
+}
+
+/* ===== 宗地地块详情弹窗（深绿极简，与土地资源语义一致） ===== */
+.yzt-parcel-detail-overlay {
+  position: absolute;
+  inset: 0;
+  width: var(--dash-w);
+  height: var(--dash-h);
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10050;
+  font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+}
+
+.yzt-parcel-detail-overlay.hidden {
+  display: none;
+}
+
+.yzt-parcel-detail-dialog {
+  width: 1560px;
+  max-width: 92%;
+  max-height: 86%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #141b2a 0%, #121826 48%, #101520 100%);
+  border: 1px solid #00a86b;
+  border-radius: 4px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+}
+
+.yzt-parcel-detail-head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  background: #1a2332;
+  border-bottom: 1px solid #00a86b;
+}
+
+.yzt-parcel-detail-title {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.yzt-parcel-detail-x {
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 52px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  margin: 0;
+  font-family: inherit;
+}
+
+.yzt-parcel-detail-x:hover {
+  color: #00a86b;
+}
+
+.yzt-parcel-detail-main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  gap: 20px;
+  padding: 20px 22px 12px;
+}
+
+.yzt-parcel-detail-preview {
+  flex: 0 0 33.333%;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.yzt-parcel-detail-map {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 1px solid #00a86b;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #0a0f18;
+}
+
+.yzt-parcel-detail-map .leaflet-control-container {
+  display: none;
+}
+
+.yzt-parcel-detail-side {
+  flex: 1 1 66.666%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.yzt-parcel-detail-tabs {
+  display: flex;
+  flex-shrink: 0;
+  border: 1px solid #2d3748;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.yzt-parcel-detail-tab {
+  flex: 1;
+  border: none;
+  border-right: 1px solid #2d3748;
+  background: #2d3748;
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 500;
+  padding: 12px 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.yzt-parcel-detail-tab:last-child {
+  border-right: none;
+}
+
+.yzt-parcel-detail-tab.active {
+  background: #00a86b;
+  color: #ffffff;
+}
+
+.yzt-parcel-detail-tab:hover:not(.active) {
+  background: #3d4f63;
+}
+
+.yzt-parcel-detail-panels {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.yzt-parcel-detail-panel {
+  display: none;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.yzt-parcel-detail-panel.active {
+  display: block;
+}
+
+.yzt-pd-row {
+  display: grid;
+  grid-template-columns: minmax(200px, 40%) 1fr;
+  column-gap: 16px;
+  font-size: 40px;
+  line-height: 48px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.yzt-pd-k {
+  color: #9ca3af;
+  text-align: left;
+}
+
+.yzt-pd-v {
+  color: #ffffff;
+  text-align: left;
+  font-weight: 500;
+}
+
+.yzt-pd-v.yzt-pd-hl {
+  color: #00a86b;
+}
+
+.yzt-parcel-detail-foot {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 22px 20px;
+  background: transparent;
+}
+
+.yzt-parcel-detail-btn-close {
+  min-width: 160px;
+  padding: 12px 36px;
+  font-size: 40px;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 2px;
+  border: 1px solid #00a86b;
+  background: #00a86b;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.yzt-parcel-detail-btn-close:hover {
+  background: #00c47f;
+  border-color: #00c47f;
+}
+
+/* —— 土地资源 · 农场下钻（镇南/白城）领导视角排版 —— */
+#land-view-farm .yzt-land-chart-block--donut {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+#land-view-farm .yzt-land-chart-block--waterfall {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+#land-view-farm .yzt-land-waterfall-wrap--farm-only-chart {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.yzt-land-farm-cert-hero-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 0 2px 8px;
+  text-align: center;
+}
+
+.yzt-land-hero-rate-farm-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  padding: 0;
+  width: 100%;
+}
+
+.yzt-land-hero-rate-farm-top .hero-drill-line1 {
+  font-family: var(--font-num);
+  font-size: 72px;
+  font-weight: 800;
+  color: #ea580c;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+}
+
+.yzt-land-hero-rate-farm-top .hero-drill-line2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+}
+
+.yzt-land-farm-donut-conclusion-banner {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.45;
+  padding: 0 2px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yzt-land-farm-cert-conclusion-banner {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ea580c;
+  line-height: 1.45;
+  padding: 0 4px 4px;
+  white-space: normal;
+}
+
+.yzt-donut-micro-legend-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 0;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  flex: 0 0 auto;
+  width: 100%;
+  overflow: hidden;
+}
+
+.yzt-donut-micro-legend-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 22px;
+  font-weight: 600;
+  color: rgba(220, 235, 250, 0.92);
+  flex-shrink: 0;
+}
+
+.yzt-donut-micro-legend-list li + li::before {
+  content: "|";
+  margin: 0 10px;
+  color: rgba(160, 190, 210, 0.45);
+  font-weight: 500;
+}
+
+.yzt-donut-legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  flex-shrink: 0;
+}
+
+.yzt-land-donut-single--farm {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 120px;
+}
+
+.yzt-land-donut-single--farm .yzt-land-donut-chart {
+  flex: 1 1 auto;
+  min-height: 140px;
+}
+
+#land-view-farm .yzt-land-waterfall-chart {
+  min-height: 130px !important;
+}
+
+.yzt-farm-kpi-two {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  width: 100%;
+  height: 100%;
+  align-items: stretch;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.yzt-farm-kpi-bigcard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+  min-width: 0;
+  border-radius: 0;
+  background: rgba(0, 24, 18, 0.45);
+  border: 1px solid rgba(0, 90, 58, 0.95);
+  box-shadow: none;
+  padding: 8px 6px;
+}
+
+.yzt-farm-kpi-bigcard + .yzt-farm-kpi-bigcard {
+  border-left: none;
+}
+
+.yzt-farm-kpi-bigcard-lbl {
+  font-size: 24px;
+  font-weight: 600;
+  color: rgba(200, 220, 235, 0.82);
+  letter-spacing: 0.06em;
+}
+
+.yzt-farm-kpi-bigcard-num {
+  font-family: var(--font-num);
+  font-size: 64px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  text-shadow: none;
+}
+
+.yzt-farm-kpi-bigcard-unit {
+  font-size: 22px;
+  font-weight: 600;
+  color: rgba(200, 220, 235, 0.82);
+}
+
+.yzt-land-terrace--farm .yzt-land-terrace-tier--farm-inline {
+  justify-content: center;
+  align-items: center;
+}
+
+.yzt-land-terrace-label--farm-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px 10px;
+  max-width: 100%;
+}
+
+.yzt-land-terrace-inline {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.38;
+  color: #fff;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.55);
+  white-space: normal;
+}
+
+.yzt-land-village-alert-line {
+  width: 100%;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ea580c;
+  line-height: 1.4;
+  padding-bottom: 10px;
+  margin-bottom: 6px;
+  border-bottom: none;
+}
+
+.yzt-land-region-bar .bar-fill--warn {
+  background: linear-gradient(90deg, #9a3412, #ea580c);
+}
+
+.yzt-land-region-card .region-area--warn {
+  color: #ea580c;
+  font-family: var(--font-num);
+  font-weight: 700;
+}
+
+.yzt-land-region-card--village-warn .region-name {
+  color: #fde68a;
+}
+
+.yzt-land-village-rank-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 6px;
+  min-height: 48px;
+  font-size: 24px;
+  border-bottom: 1px solid rgba(0, 255, 160, 0.1);
+}
+
+.yzt-land-village-rank-row:last-child {
+  border-bottom: none;
+}
+
+.yzt-village-name {
+  font-weight: 600;
+  color: #e8f4ff;
+  flex: 1 1 auto;
+}
+
+.yzt-village-rate {
+  font-family: var(--font-num);
+  font-weight: 700;
+  color: rgba(200, 230, 250, 0.95);
+  flex: 0 0 auto;
+  min-width: 5.5em;
+  text-align: right;
+}
+
+.yzt-village-rate--warn {
+  color: #ea580c;
+}
+
+.yzt-parcel-hover-card--landtip {
+  min-width: 200px;
+}
+
+.yzt-parcel-hover-card--landtip .yzt-parcel-hover-title {
+  font-size: 24px;
+}
+
+.yzt-parcel-hover-card--landtip .yzt-parcel-hover-row {
+  font-size: 18px;
+}
+
+/* ===== 集团总览 · 左侧三模块专属样式 ===== */
+
+/* 集团概况 KPI 双卡片 */
+.yzt-land-group-kpi {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  width: 100%;
+  height: 100%;
+  align-items: stretch;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.yzt-land-group-kpi-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  min-width: 0;
+  border-radius: 4px;
+  background: rgba(18, 24, 36, 0.72);
+  border: 1px solid rgba(0, 90, 58, 0.95);
+  padding: 16px 12px;
+}
+
+.yzt-land-group-kpi-card + .yzt-land-group-kpi-card {
+  border-left: none;
+}
+
+.yzt-land-group-kpi-lbl {
+  font-size: 28px;
+  font-weight: 600;
+  color: rgba(200, 220, 235, 0.82);
+  letter-spacing: 0.06em;
+}
+
+.yzt-land-group-kpi-num {
+  font-family: var(--font-num);
+  font-size: 76px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.yzt-land-group-kpi-unit {
+  font-size: 26px;
+  font-weight: 600;
+  color: rgba(200, 220, 235, 0.82);
+}
+
+/* 农场土地利用 · 双环形图并列 */
+.yzt-land-donut-dual {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  align-items: stretch;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.yzt-land-donut-half {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.yzt-land-donut-half .yzt-land-donut-chart {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+.yzt-land-donut-farm-label {
+  flex-shrink: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: rgba(200, 230, 255, 0.9);
+  text-align: center;
+  padding: 4px 6px 2px;
+  letter-spacing: 0.04em;
+}
+
+/* 农场对比卡片 */
+.yzt-land-farm-compare {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  align-items: stretch;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.yzt-land-farm-compare-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+  min-width: 0;
+  border-radius: 6px;
+  padding: 10px 8px;
+  overflow: hidden;
+}
+
+.yzt-land-farm-compare-card--baicheng {
+  background: linear-gradient(145deg, rgba(0, 168, 107, 0.48) 0%, rgba(0, 80, 50, 0.32) 100%);
+  border: 1px solid rgba(0, 200, 120, 0.65);
+}
+
+.yzt-land-farm-compare-card--zhennan {
+  background: linear-gradient(145deg, rgba(0, 180, 216, 0.42) 0%, rgba(0, 80, 120, 0.30) 100%);
+  border: 1px solid rgba(0, 180, 216, 0.65);
+}
+
+.yzt-land-farm-compare-name {
+  font-size: 26px;
+  font-weight: 700;
+  color: #e8fff4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.yzt-land-farm-compare-num-unit {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.yzt-land-farm-compare-num {
+  font-family: var(--font-num);
+  font-size: 58px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.yzt-land-farm-compare-unit {
+  font-size: 24px;
+  font-weight: 600;
+  color: rgba(220, 240, 255, 0.85);
+}
+
+.yzt-land-farm-compare-diff {
+  font-size: 22px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.yzt-land-farm-compare-diff.up {
+  color: #00FF88;
+}
+
+.yzt-land-farm-compare-diff.down {
+  color: #FF9F1C;
+}
+
+.yzt-land-farm-compare-share {
+  font-size: 22px;
+  font-weight: 600;
+  color: rgba(200, 220, 235, 0.82);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.yzt-land-farm-compare-share span {
+  color: #ffffff;
+  font-family: var(--font-num);
+  font-weight: 700;
+}
+
+/* 集团土地利用环形图 · 结论文字 */
+.yzt-land-donut-conclusion {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.45;
+  padding: 6px 2px 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 集团土地利用环形图 · 横向图例 */
+.yzt-land-donut-legend {
+  flex-shrink: 0;
+  padding: 6px 2px 0;
+}
+
+.yzt-land-donut-legend .yzt-donut-legend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+}
+
+.yzt-land-donut-legend .yzt-donut-legend-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 24px;
+  font-weight: 600;
+  color: rgba(220, 235, 250, 0.92);
+  flex-shrink: 0;
+}
+
+.yzt-land-donut-legend .yzt-donut-legend-list li + li::before {
+  content: "|";
+  margin: 0 10px;
+  color: rgba(160, 190, 210, 0.45);
+  font-weight: 500;
+}
+
+.yzt-land-donut-legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  flex-shrink: 0;
+}
+
+/* 集团权籍调查 · 结论文字（橙色） */
+.yzt-land-waterfall-conclusion {
+  flex: 0 0 auto;
+  font-size: 26px;
+  font-weight: 700;
+  color: #ea580c;
+  line-height: 1.45;
+  padding: 0 2px 4px;
+  text-align: center;
+}
+
+/* 集团 donut 图表区：三行网格给结论和 legend 留出空间 */
+.yzt-side-left.yzt-mode-analysis:not(.yzt-land-drill) .yzt-land-chart-block--donut {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+/* 瀑布图集团视图：hero rate 橙色大字 */
+.yzt-land-hero-rate--group .hero-label {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ea580c;
+  margin-right: 12px;
+}
+
+.yzt-land-hero-rate--group .hero-value {
+  font-family: var(--font-num);
+  font-size: 64px;
+  font-weight: 800;
+  color: #ea580c;
+}
+
+/* ===== 宗地详情弹窗 · 所属农场行 ===== */
+.yzt-parcel-detail-farm {
+  margin: 4px 0 0;
+  font-size: 34px;
+  font-weight: 700;
+  color: #00a86b;
+  letter-spacing: 0.5px;
+}
+
+/* =====================================================
+   物联网设备标签页 · 专属样式
+   ===================================================== */
+
+/* --- IoT 大KPI卡片（沿用 land-group-kpi-card 视觉） --- */
+.yzt-iot-kpi-block { flex-shrink: 0; margin-bottom: 10px; }
+.yzt-iot-bigkpi-row { display: flex; gap: 0; }
+.yzt-iot-bigkpi {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; gap: 8px; min-width: 0; border-radius: 4px;
+  background: rgba(18, 24, 36, 0.72); border: 1px solid rgba(0, 90, 58, 0.95);
+  padding: 16px 12px;
+}
+.yzt-iot-bigkpi + .yzt-iot-bigkpi { border-left: none; }
+.yzt-iot-bigkpi-lbl { font-size: 28px; font-weight: 600; color: rgba(200, 220, 235, 0.82); letter-spacing: 0.04em; }
+.yzt-iot-bigkpi-num { font-family: var(--font-num); font-size: 76px; font-weight: 800; color: #ffffff; line-height: 1; }
+.yzt-iot-bigkpi-num.is-warn { color: #ea580c; }
+.yzt-iot-bigkpi-sub { font-size: 26px; font-weight: 600; color: rgba(200, 220, 235, 0.72); }
+.yzt-iot-bigkpi-sub.is-warn { color: #ea580c; }
+
+/* --- IoT 左栏图表容器 --- */
+#iot-left-donut, #iot-left-bar {
+  flex: 1 1 0; min-height: 180px; background: rgba(0, 0, 0, 0.28); border-radius: 6px; overflow: hidden;
+}
+
+/* --- IoT 快速筛选 --- */
+.yzt-iot-filter-row {
+  flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; padding: 8px 0;
+}
+.yzt-iot-filter-group { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.yzt-iot-filter-label { font-size: 24px; font-weight: 600; color: rgba(200, 220, 235, 0.82); margin-right: 4px; }
+.yzt-iot-check {
+  display: flex; align-items: center; gap: 4px; font-size: 22px; color: rgba(170, 210, 240, 0.8); cursor: pointer;
+  font-family: var(--font-ui); line-height: 1.3;
+}
+.yzt-iot-check input[type="checkbox"] { accent-color: #00a86b; }
+
+/* --- IoT 右侧面板 --- */
+.yzt-iot-right-panel {
+  flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+}
+.yzt-iot-section-title {
+  font-size: 28px; font-weight: 700; color: var(--accent-green); padding-left: 8px;
+  border-left: 3px solid var(--accent-cyan); margin-bottom: 8px;
+}
+
+/* 告警列表 */
+.yzt-iot-alert-block { flex-shrink: 0; }
+.yzt-iot-alert-list { display: flex; flex-direction: column; gap: 8px; }
+.yzt-iot-alert-item {
+  display: flex; flex-direction: column; gap: 4px; padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.28); border: 1px solid rgba(0, 255, 160, 0.12); border-radius: 4px;
+}
+.yzt-iot-alert-item.level-info { border-left: 3px solid #FFB800; }
+.yzt-iot-alert-item.level-danger { border-left: 3px solid #FF6B6B; }
+.yzt-iot-alert-item.level-warning { border-left: 3px solid #ea580c; }
+.yzt-iot-alert-item .alert-text { font-size: 24px; color: var(--text-primary); line-height: 1.4; }
+.yzt-iot-alert-item .alert-time { font-size: 22px; color: var(--text-secondary); font-family: var(--font-num); }
+
+/* 实时数据 */
+.yzt-iot-rt-block { flex-shrink: 0; }
+.yzt-iot-rt-grid { display: flex; flex-direction: column; gap: 6px; }
+.yzt-iot-rt-row {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+  padding: 8px 10px; background: rgba(0, 0, 0, 0.22); border: 1px solid rgba(0, 255, 160, 0.08); border-radius: 4px;
+}
+.yzt-iot-rt-row .rt-dev { font-size: 24px; color: var(--accent-green); font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.yzt-iot-rt-row .rt-val { font-size: 24px; color: var(--accent-cyan); font-family: var(--font-num); font-weight: 700; flex-shrink: 0; text-align: right; }
+
+/* 运营统计 */
+.yzt-iot-ops-block { flex-shrink: 0; }
+.yzt-iot-ops-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.yzt-iot-ops-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  padding: 12px 8px; background: rgba(0, 0, 0, 0.28); border: 1px solid rgba(0, 255, 160, 0.12); border-radius: 4px;
+}
+.yzt-iot-ops-val { font-family: var(--font-num); font-size: 38px; font-weight: 700; color: var(--accent-cyan); line-height: 1; }
+.yzt-iot-ops-lbl { font-size: 22px; color: rgba(170, 210, 240, 0.75); }
+
+/* --- 设备地图点位 --- */
+.yzt-device-marker { background: transparent !important; border: none !important; }
+.yzt-device-marker svg { width: 48px; height: 48px; }
+.yzt-device-marker svg .dev-shape { stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.yzt-device-online svg .dev-shape { stroke: #00FF88; fill: rgba(0, 255, 136, 0.18); }
+.yzt-device-offline svg .dev-shape { stroke: #9CA3AF; fill: rgba(156, 163, 175, 0.12); }
+.yzt-device-fault svg .dev-shape { stroke: #FF6B6B; fill: rgba(255, 107, 107, 0.18); }
+@keyframes yzt-fault-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+.yzt-device-fault svg { animation: yzt-fault-blink 1.2s ease-in-out infinite; }
+
+/* 设备地图图例 */
+.yzt-map-device-legend {
+  position: absolute; right: 16px; top: 96px; z-index: 905; min-width: 180px;
+  padding: 14px 16px; background: rgba(6, 16, 28, 0.55); border: 1px solid rgba(0, 229, 255, 0.28);
+  border-radius: 8px; backdrop-filter: blur(12px); color: rgba(220, 235, 250, 0.92);
+  display: flex; flex-direction: column; gap: 8px; font-size: 28px;
+}
+.yzt-map-device-legend.hidden { display: none; }
+.yzt-map-device-legend-title { font-size: 30px; font-weight: 600; margin-bottom: 2px; letter-spacing: 0.5px; }
+.yzt-map-device-legend-row { display: flex; align-items: center; gap: 10px; }
+.yzt-map-device-legend-row .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 4px rgba(0,0,0,0.3); }
+
+/* 设备 tooltip */
+.leaflet-tooltip.yzt-device-tip {
+  min-width: 240px; font-size: 30px; line-height: 1.5; border-color: rgba(0, 212, 255, 0.35);
+}
+
+/* 设备详情弹窗历史数据图表 */
+#dd-panel-history .dd-history-chart { width: 100%; height: 280px; }
+
+/* 远程控制按钮 */
+.yzt-dd-ctrl-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.yzt-dd-ctrl-btn {
+  flex: 1; min-width: 120px; padding: 14px 20px; border-radius: 4px; font-size: 38px; font-weight: 600;
+  cursor: pointer; font-family: var(--font-ui); border: 1px solid var(--accent-green);
+  background: rgba(0, 255, 136, 0.12); color: var(--accent-green); transition: all 0.2s;
+}
+.yzt-dd-ctrl-btn:hover { background: rgba(0, 255, 136, 0.24); }
+.yzt-dd-ctrl-btn.off { border-color: #FF6B6B; background: rgba(255, 107, 107, 0.12); color: #FF6B6B; }
+.yzt-dd-ctrl-btn.off:hover { background: rgba(255, 107, 107, 0.24); }
+.yzt-dd-ctrl-btn.warn { border-color: #FFB800; background: rgba(255, 184, 0, 0.1); color: #FFB800; }
+
+/* ---- IoT 地图图例筛选面板 ---- */
+.yzt-device-legend-title {
+  font-size: 30px; font-weight: 700; color: var(--accent-cyan);
+  margin-bottom: 8px; padding-bottom: 6px;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+}
+.yzt-map-device-legend .yzt-legend-section {
+  display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px;
+}
+.yzt-map-device-legend .yzt-legend-group-label {
+  font-size: 24px; font-weight: 600; color: rgba(200, 220, 235, 0.82);
+}
+.yzt-iot-abnormal-btn {
+  margin-top: 8px; padding: 8px 16px; font-size: 26px; font-weight: 600;
+  background: rgba(255, 107, 107, 0.18); border: 1px solid #FF6B6B;
+  color: #FF6B6B; border-radius: 4px; cursor: pointer;
+  font-family: var(--font-ui); transition: all 0.2s; width: 100%;
+}
+.yzt-iot-abnormal-btn:hover { background: rgba(255, 107, 107, 0.32); }
+
+/* ---- IoT 左侧汇总/详情面板 ---- */
+.yzt-iot-summary-block { display: flex; flex-direction: column; gap: 8px; }
+.yzt-iot-summary-row { display: flex; gap: 8px; }
+.yzt-iot-summary-kpi {
+  flex: 1; padding: 14px 12px; text-align: center;
+  background: rgba(18, 24, 36, 0.72); border: 1px solid rgba(0, 90, 58, 0.95);
+  border-radius: 4px;
+}
+.yzt-iot-summary-kpi .k-label { font-size: 26px; color: rgba(200, 220, 235, 0.78); }
+.yzt-iot-summary-kpi .k-val { font-size: 48px; font-weight: 800; color: #fff; font-family: var(--font-num); }
+.yzt-iot-summary-kpi .k-val.green { color: #00FF88; }
+.yzt-iot-summary-kpi .k-val.warn { color: #FF6B6B; }
+
+.yzt-iot-detail-block { display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; }
+.yzt-iot-detail-head { text-align: center; padding: 12px 8px; }
+.yzt-iot-detail-title { font-size: 32px; font-weight: 700; color: #fff; }
+.yzt-iot-detail-sub { font-size: 24px; color: var(--text-secondary); margin-top: 4px; }
+.yzt-iot-detail-value { font-size: 52px; font-weight: 800; color: #00FF88; font-family: var(--font-num); margin-top: 6px; }
+.yzt-iot-detail-readings { display: flex; flex-direction: column; gap: 4px; max-height: 240px; overflow-y: auto; flex: 1; }
+.yzt-iot-reading-row {
+  display: flex; justify-content: space-between; padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.22); border-radius: 3px;
+}
+.yzt-iot-reading-row .lbl { font-size: 24px; color: var(--text-secondary); }
+.yzt-iot-reading-row .val { font-size: 26px; color: var(--accent-cyan); font-weight: 600; font-family: var(--font-num); }
+
+/* ---- IoT 设备标记 ---- */
+.yzt-device-marker { background: transparent !important; border: none !important; }
+.yzt-device-marker .m-label {
+  display: block; font-size: 22px; font-weight: 600; color: rgba(220, 235, 250, 0.92);
+  text-align: center; white-space: nowrap; margin-top: 2px;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+}
+.yzt-iot-filter-row.yzt-hidden, .yzt-filter-iot.yzt-hidden { display: none; }
+
+/* ---- IoT 筛选状态提示 ---- */
+.yzt-filter-status {
+  font-size: 24px; color: #FFB800; padding: 8px 12px;
+  background: rgba(255, 184, 0, 0.08); border: 1px solid rgba(255, 184, 0, 0.25);
+  border-radius: 4px; text-align: center; word-break: break-all;
+}
+.yzt-filter-status.hidden { display: none; }
+
+/* ---- IoT 交叉统计表 ---- */
+.yzt-iot-cross-block { flex-shrink: 0; }
+.yzt-cross-table { width: 100%; border-collapse: collapse; font-size: 22px; }
+.yzt-cross-table th {
+  text-align: center; padding: 6px 4px; color: rgba(170, 210, 240, 0.75);
+  font-weight: 600; border-bottom: 1px solid rgba(0, 255, 160, 0.15);
+}
+.yzt-cross-table td {
+  text-align: center; padding: 5px 4px; color: rgba(220, 235, 250, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.yzt-cross-table .c-label { text-align: left; font-weight: 600; color: var(--accent-cyan); }
+.yzt-cross-table .c-ok { color: #00FF88; font-weight: 700; }
+.yzt-cross-table .c-warn { color: #FF6B6B; font-weight: 700; }
+.yzt-cross-table .c-zero { color: rgba(156, 163, 175, 0.5); }
+.yzt-cross-table .c-total { font-weight: 700; color: #fff; }
+
+/* ---- 设备详情 · 历史采集表 ---- */
+.dd-history-table-wrap { max-height: 260px; overflow-y: auto; margin-top: 10px; }
+.dd-history-table { width: 100%; border-collapse: collapse; font-size: 24px; }
+.dd-history-table th {
+  text-align: left; padding: 8px 10px; color: rgba(170, 210, 240, 0.7);
+  font-weight: 600; border-bottom: 1px solid rgba(0, 255, 160, 0.2);
+  position: sticky; top: 0; background: rgba(4, 14, 26, 0.95);
+}
+.dd-history-table td {
+  padding: 6px 10px; color: rgba(220, 235, 250, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.dd-history-table .rec-ok { color: #00FF88; font-weight: 600; }
+
+/* ---- 阀门运行状态 ---- */
+.yzt-valve-status {
+  display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;
+  padding: 14px 16px; background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 255, 136, 0.15); border-radius: 6px;
+}
+.yzt-valve-status-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.yzt-valve-status-item:last-child { border-bottom: none; }
+.yzt-valve-status-item .lbl { font-size: 28px; color: rgba(200, 220, 235, 0.7); }
+.yzt-valve-status-item .val { font-size: 30px; color: #fff; font-weight: 600; font-family: var(--font-num); }
+.yzt-valve-status-item .val.on { color: #00FF88; }
+.yzt-valve-status-item .val.off { color: #9CA3AF; }
+.yzt-valve-status-item .val.hl { color: var(--accent-cyan); }
