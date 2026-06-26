@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=3840, height=1920, initial-scale=1">
+  <meta name="screen-orientation" content="landscape">
+  <title>农垦一张图 — 农发集团智慧农业综合管控平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/yizhangtu.css">
+  <link rel="stylesheet" href="css/yizhangtu-plant.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <div id="scale-wrapper">
+    <div id="scale-inner">
+      <div id="dashboard" class="dashboard yzt-dashboard">
+
+        <!-- 顶栏 -->
+        <header class="yzt-header yzt-seam-safe">
+          <div class="yzt-header-left">
+            <div class="logo">
+              <svg viewBox="0 0 48 48" fill="none"><path d="M24 4C24 4 8 20 8 32C8 40 15 44 24 44C33 44 40 40 40 32C40 20 24 4 24 4Z" fill="url(#lg2)"/><defs><linearGradient id="lg2" x1="8" y1="4" x2="40" y2="44"><stop stop-color="#00FF88"/><stop offset="1" stop-color="#00D4FF"/></linearGradient></defs></svg>
+            </div>
+            <a href="index.html" class="yzt-back-btn" id="yzt-back-btn">← 返回首页</a>
+            <div class="yzt-title-group">
+              <div class="yzt-title-row">
+                <h1 id="yzt-page-title">农垦一张图</h1>
+              </div>
+            </div>
+          </div>
+          <div class="yzt-header-right">
+            <nav class="yzt-tabbar yzt-header-tabs" aria-label="地图数据维度">
+              <button type="button" class="yzt-bottom-tab active" data-tab="land">土地资源</button>
+              <button type="button" class="yzt-bottom-tab" data-tab="iot">物联网设备</button>
+              <button type="button" class="yzt-bottom-tab" data-tab="plant">种植经营</button>
+            </nav>
+            <div class="yzt-header-weather" id="header-weather">
+              <span class="hw-temp" id="hw-temp">26°</span>
+              <span class="hw-icon" id="hw-icon">☀</span>
+              <span class="hw-desc" id="hw-desc">晴</span>
+              <span class="hw-humid" id="hw-humid">湿度52%</span>
+            </div>
+            <div class="yzt-time" id="clock">--:--:--</div>
+            <button class="yzt-help-btn" id="help-btn" title="交互说明（非系统UI）">📋 交互说明</button>
+          </div>
+        </header>
+
+        <!-- 主体：15% | 70% | 15% -->
+        <main class="yzt-body">
+
+          <!-- 左栏 15% -->
+          <aside class="yzt-side yzt-side-left">
+            <!-- 种植经营：地块检索 -->
+            <div class="yzt-left-plot" id="yzt-left-plot">
+              <!-- 左上：年度种植计划 -->
+              <div class="yzt-plant-left-module yzt-plant-annual-plan">
+                <div class="yzt-plot-panel-head">
+                  <div class="yzt-plot-panel-title">年度种植计划</div>
+                </div>
+                <div class="annual-plan-body">
+                  <div class="annual-plan-kpi" id="annual-plan-kpi"></div>
+                  <div class="annual-plan-gauge" id="annual-plan-gauge"></div>
+                </div>
+              </div>
+
+              <!-- 左中：农艺配方滚动列表 -->
+              <div class="yzt-plant-left-module yzt-plant-formula-list">
+                <div class="yzt-plot-panel-head">
+                  <div class="yzt-plot-panel-title">农艺配方</div>
+                </div>
+                <div class="formula-table-wrap" id="formula-table-wrap"></div>
+              </div>
+
+              <!-- 左中2：累计投入（统种） -->
+              <div class="yzt-plant-left-module yzt-plant-invest-summary">
+                <div class="yzt-plot-panel-head">
+                  <div class="yzt-plot-panel-title">累计投入（统种）</div>
+                </div>
+                <div class="yzt-invest-pie-row">
+                  <div class="yzt-invest-pie-wrap"><div id="invest-pie-1" class="yzt-invest-pie"></div><div class="yzt-invest-pie-label">农资</div></div>
+                  <div class="yzt-invest-pie-wrap"><div id="invest-pie-2" class="yzt-invest-pie"></div><div class="yzt-invest-pie-label">农机</div></div>
+                  <div class="yzt-invest-pie-wrap"><div id="invest-pie-3" class="yzt-invest-pie"></div><div class="yzt-invest-pie-label">其他</div></div>
+                </div>
+                <div class="yzt-invest-card-row">
+                  <div class="yzt-invest-card" id="invest-card-1"></div>
+                  <div class="yzt-invest-card" id="invest-card-2"></div>
+                  <div class="yzt-invest-card" id="invest-card-3"></div>
+                </div>
+              </div>
+
+              <!-- 气象监测：左栏 -->
+              <div class="yzt-plant-left-module yzt-hidden" id="plant-weather-left-panel">
+                <div class="yzt-weather-year-tabs" id="weather-left-year-tabs">
+                  <button class="yzt-weather-year-tab active" data-wy="thisYear">近一年</button>
+                  <button class="yzt-weather-year-tab" data-wy="fiveYear">近五年</button>
+                </div>
+                <div class="yzt-plot-panel-head"><div class="yzt-plot-panel-title">温度变化</div></div>
+                <div id="weather-left-temp-chart" class="yzt-plant-left-chart yzt-weather-chart"></div>
+                <div class="yzt-plot-panel-head"><div class="yzt-plot-panel-title">湿度变化</div></div>
+                <div id="weather-left-humid-chart" class="yzt-plant-left-chart yzt-weather-chart"></div>
+                <div class="yzt-plot-panel-head"><div class="yzt-plot-panel-title">总降水量变化</div></div>
+                <div id="weather-left-rain-chart" class="yzt-plant-left-chart yzt-weather-chart"></div>
+              </div>
+            </div>
+            <!-- 土地资源 / 物联网：数据分析 -->
+            <div class="yzt-left-analysis yzt-hidden" id="yzt-left-analysis">
+              <div class="yzt-iot-grid-title yzt-hidden" id="iot-device-list-title">物联网设备统计</div>
+              <div class="yzt-side-label yzt-hidden" aria-hidden="true"></div>
+              <div class="gkpi-row" id="left-kpi-row"></div>
+              <!-- IoT 顶部：大KPI卡片 -->
+              <div class="yzt-iot-kpi-block yzt-hidden" id="yzt-iot-kpi-block">
+                <div class="yzt-iot-bigkpi-row">
+                  <div class="yzt-iot-bigkpi" id="iot-bigkpi-devices"></div>
+                  <div class="yzt-iot-bigkpi" id="iot-bigkpi-alerts"></div>
+                </div>
+              </div>
+              <!-- IoT 中部：设备类型网格 -->
+              <div class="yzt-iot-device-grid-wrap yzt-hidden" id="iot-device-list-wrap">
+                <div id="iot-device-list" class="yzt-iot-device-grid"></div>
+                <!-- <div class="yzt-iot-entity-card yzt-hidden" id="iot-entity-card">
+                  <div class="ec-head" id="ec-head"></div>
+                  <div class="ec-grid" id="ec-grid"></div>
+                </div> -->
+              </div>
+              <!-- IoT 汇总面板（未选中设备时） -->
+              <div id="yzt-iot-summary-block" class="yzt-iot-summary-block yzt-hidden">
+                <div id="iot-filter-status" class="yzt-filter-status hidden"></div>
+              </div>
+              <!-- IoT 设备详情面板（选中设备时） -->
+              <div id="yzt-iot-detail-block" class="yzt-iot-detail-block yzt-hidden">
+                <button class="yzt-iot-back-btn" id="iot-detail-back">← 返回全局</button>
+                <div class="yzt-iot-detail-head" id="iot-detail-head"></div>
+                <div class="yzt-iot-section-title">远程控制</div>
+                <div id="iot-detail-control"></div>
+                <div class="yzt-iot-section-title">实时数据</div>
+                <div class="yzt-iot-detail-readings" id="iot-detail-readings"></div>
+                <div class="yzt-iot-section-title">历史数据</div>
+                <div id="iot-detail-history-chart" class="yzt-side-chart" style="height:140px;flex-shrink:0"></div>
+              </div>
+              <div class="yzt-land-chart-list">
+                <div class="yzt-land-view-group" id="land-view-group">
+                  <div class="yzt-land-chart-block">
+                    <div class="yzt-land-chart-title">确权面积统计</div>
+                    <div id="land-farm-cards" class="yzt-land-viz yzt-land-group-kpi"></div>
+                  </div>
+                  <div class="yzt-land-chart-block">
+                    <div class="yzt-land-chart-title">确权面积分布</div>
+                    <div id="left-chart-3" class="yzt-land-viz yzt-land-waterfall-chart"></div>
+                  </div>
+                  <div class="yzt-land-chart-block">
+                    <div class="yzt-land-chart-title">土地利用占比</div>
+                    <div id="left-chart-2" class="yzt-land-viz"></div>
+                  </div>
+                </div>
+                <div class="yzt-land-view-farm yzt-hidden" id="land-view-farm">
+                  <div class="yzt-land-chart-block yzt-land-drill-kpi">
+                    <div class="yzt-land-chart-head">
+                      <div class="yzt-land-chart-title" id="land-farm-drill-title">农场概况</div>
+                    </div>
+                    <div id="land-farm-kpi-cards" class="yzt-land-viz yzt-farm-kpi-cards" data-farm-kpi-panel></div>
+                  </div>
+                  <div class="yzt-land-chart-block yzt-land-chart-block--donut">
+                    <div class="yzt-land-chart-head">
+                      <div class="yzt-land-chart-title">农场土地利用类型面积统计</div>
+                    </div>
+                    <div class="yzt-land-chart-sub yzt-land-farm-donut-conclusion-banner" id="land-farm-donut-conclusion"></div>
+                    <div class="yzt-land-viz yzt-land-donut-single yzt-land-donut-single--farm">
+                      <div id="left-chart-2-farm" class="yzt-land-donut-chart"></div>
+                      <div id="land-farm-donut-legend" class="yzt-land-donut-micro-legend" aria-hidden="true"></div>
+                    </div>
+                  </div>
+                  <div class="yzt-land-chart-block yzt-land-chart-block--waterfall">
+                    <div class="yzt-land-chart-head">
+                      <div class="yzt-land-chart-title">农场权籍调查面积统计</div>
+                    </div>
+                    <div class="yzt-land-farm-cert-hero-stack" id="land-farm-cert-hero-stack">
+                      <div class="yzt-land-hero-rate yzt-land-hero-rate--warn yzt-land-hero-rate-farm-top" id="land-hero-rate-farm"></div>
+                      <div class="yzt-land-chart-sub yzt-land-farm-cert-conclusion-banner" id="land-farm-cert-conclusion"></div>
+                    </div>
+                    <div class="yzt-land-viz yzt-land-waterfall-wrap yzt-land-waterfall-wrap--farm-only-chart">
+                      <div id="left-chart-3-farm" class="yzt-land-waterfall-chart"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- 中栏 70%：GIS 地图 -->
+          <section class="yzt-center">
+            <div class="yzt-map-wrap">
+              <div id="yzt-gis-map"></div>
+
+              <!-- 种植经营：农场-地块筛选（地图左上角） -->
+              <div class="yzt-plant-stats-table yzt-hidden" id="plant-stats-table">
+                <div class="pst-head" id="pst-head">
+                  <div class="pst-head-row">
+                    <span class="pst-head-title">农场地块筛选</span>
+                    <button class="pst-head-toggle" id="pst-toggle" title="收起">▲</button>
+                  </div>
+                  <div class="pst-filter-row">
+                    <div class="yzt-select pst-year-select" id="pst-year-select">
+                      <button type="button" class="yzt-select-trigger">
+                        <span class="yzt-select-text">2026年种植季</span>
+                        <span class="yzt-select-arrow"></span>
+                      </button>
+                      <div class="yzt-select-options"></div>
+                    </div>
+                  </div>
+                  <div class="pst-filter-row">
+                    <input class="pst-search-input" id="pst-search-input" type="text" placeholder="搜索地块名称...">
+                  </div>
+                </div>
+                <div class="pst-body" id="pst-body"></div>
+              </div>
+
+              <!-- 气象温度色标栏 -->
+              <div class="yzt-temp-scale yzt-hidden" id="temp-scale-bar">
+                <div class="ts-title">温度℃</div>
+                <div class="ts-gradient"></div>
+                <div class="ts-labels"><span>46.85</span><span>29.85</span><span>20.85</span><span>9.85</span><span>0.85</span><span>0</span><span>-4.15</span><span>-8.15</span><span>-15.15</span><span>-25.15</span><span>-40.15</span><span>-55.15</span><span>-70.15</span><span>-85.15</span></div>
+              </div>
+
+              <!-- 通用垂直光谱色标栏（左侧） -->
+              <div class="yzt-spectral-bar yzt-hidden" id="spectral-bar">
+                <div class="sb-title" id="sb-title">—</div>
+                <div class="sb-gradient" id="sb-gradient"></div>
+                <div class="sb-labels" id="sb-labels"></div>
+              </div>
+
+              <!-- 地块土壤等级卡片（选中地块后显示） -->
+              <div class="yzt-soil-plot-card yzt-hidden" id="soil-plot-card">
+                <div class="spc-title" id="spc-title">地块养分等级</div>
+                <div id="spc-list" class="spc-list"></div>
+              </div>
+
+              <!-- 土壤等级色标卡片 -->
+              <div class="yzt-soil-level-card yzt-hidden" id="soil-level-card">
+                <div class="slc-title" id="slc-title">土壤养分等级</div>
+                <div id="slc-list" class="slc-list"></div>
+              </div>
+
+              <!-- 气象实时数据面板 -->
+              <div class="yzt-weather-data-panel yzt-hidden" id="weather-data-panel">
+                <div class="wdp-header"><span class="wdp-icon">☀</span> 26° 晴朗</div>
+                <div class="wdp-grid">
+                  <div class="wdp-item"><span class="wdp-label">相对湿度 (%)</span><span class="wdp-val">57</span></div>
+                  <div class="wdp-item"><span class="wdp-label">能见度 (km)</span><span class="wdp-val">14.5</span></div>
+                  <div class="wdp-item"><span class="wdp-label">风速 (m/s)</span><span class="wdp-val">2.22</span></div>
+                  <div class="wdp-item"><span class="wdp-label">风向 (°)</span><span class="wdp-val">45</span></div>
+                  <div class="wdp-item"><span class="wdp-label">光照度 (lux)</span><span class="wdp-val">86600</span></div>
+                  <div class="wdp-item"><span class="wdp-label">天气现象</span><span class="wdp-val">晴朗</span></div>
+                  <div class="wdp-item"><span class="wdp-label">降水 (mm)</span><span class="wdp-val">0</span></div>
+                  <div class="wdp-item"><span class="wdp-label">10分钟降雨量 (mm)</span><span class="wdp-val">0</span></div>
+                  <div class="wdp-item"><span class="wdp-label">10cm土壤墒情 (%)</span><span class="wdp-val">79.8</span></div>
+                  <div class="wdp-item"><span class="wdp-label">20cm土壤墒情 (%)</span><span class="wdp-val">88.95</span></div>
+                </div>
+              </div>
+
+              <div class="yzt-map-land-veil" aria-hidden="true"></div>
+              <!-- 农场点位信息弹框 -->
+              <div class="yzt-farm-point-popup yzt-hidden" id="farm-point-popup">
+                <button class="yzt-farm-popup-close" id="farm-popup-close">&times;</button>
+                <div class="yzt-farm-popup-body" id="farm-popup-body"></div>
+              </div>
+              <!-- 农场下钻名称横幅 -->
+              <div class="yzt-farm-drill-banner yzt-hidden" id="farm-drill-banner" aria-hidden="true">
+                <span class="yzt-farm-drill-banner-name" id="farm-drill-banner-name"></span>
+                <button class="yzt-farm-drill-banner-close" id="farm-drill-banner-close">&times;</button>
+              </div>
+              <!-- <div class="yzt-map-land-use-legend hidden" id="map-land-use-legend" aria-hidden="true"></div> -->
+              <div class="yzt-map-device-legend yzt-map-float-panel yzt-hidden" id="map-device-legend" aria-hidden="true">
+                <div class="yzt-legend-section">
+                  <span class="yzt-legend-group-label">设备状态</span>
+                  <div class="yzt-map-mode-legend" id="iot-status-legend"></div>
+                </div>
+              </div>
+
+              <!-- 地图筛选 · 透明浮层（土地/IoT） -->
+              <div class="yzt-map-filter-bar yzt-map-float-panel" id="map-filter-bar">
+                <div class="yzt-map-filter-body" id="map-filter-body">
+                  <div class="yzt-map-legend-block" id="map-legend-filters">
+                    <div class="yzt-legend-filter-row yzt-filter-base">
+                      <span class="yzt-legend-group-label">确权状态</span>
+                      <div class="yzt-map-mode-legend" id="map-cert-legend"></div>
+                    </div>
+                    <div class="yzt-legend-filter-row yzt-filter-base">
+                      <span class="yzt-legend-group-label">用地类型</span>
+                      <div class="yzt-map-mode-legend" id="map-border-legend"></div>
+                    </div>
+                    <div class="yzt-legend-filter-row yzt-filter-plant">
+                      <span class="yzt-legend-group-label" id="map-fill-legend-label">作物分布</span>
+                      <div class="yzt-map-mode-legend" id="map-fill-legend"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 地块类型图例（种植经营固定） -->
+              <div class="yzt-plot-type-legend yzt-hidden" id="plot-type-legend">
+                <div class="ptl-item active" data-ptl="tong">
+                  <span class="ptl-swatch" style="background:#00FF88"></span>
+                  <span class="ptl-label">统种地</span>
+                </div>
+                <div class="ptl-item active" data-ptl="rent">
+                  <span class="ptl-swatch" style="background:#00D4FF"></span>
+                  <span class="ptl-label">承租地</span>
+                </div>
+              </div>
+
+              <!-- 种植经营：底部5场景切换按钮 -->
+              <div class="yzt-plant-toolbar yzt-hidden" id="plant-toolbar">
+                <button class="pt-btn active" data-pt="crop"><span class="pt-icon">🌱</span>作物分布</button>
+                <button class="pt-btn" data-pt="remote"><span class="pt-icon">🛰</span>遥感监测</button>
+                <button class="pt-btn" data-pt="weather"><span class="pt-icon">🌤</span>气象监测</button>
+              </div>
+
+              <!-- 遥感监测二级按钮 -->
+              <div class="yzt-remote-subs yzt-hidden" id="remote-subs">
+                <button class="rs-btn active" data-rs="nitrogen">氮含量</button>
+                <button class="rs-btn" data-rs="phosphorus">磷含量</button>
+                <button class="rs-btn" data-rs="potassium">钾含量</button>
+                <button class="rs-btn" data-rs="organic">有机质含量</button>
+                <button class="rs-btn" data-rs="moisture">墒情</button>
+                <button class="rs-btn" data-rs="soiltemp">土壤温度</button>
+                <button class="rs-btn" data-rs="growth">作物长势</button>
+                <button class="rs-btn" data-rs="valuation">作物估值</button>
+              </div>
+
+              <!-- 遥感养分等级卡片（氮/磷/钾/有机质） -->
+              <div class="yzt-remote-nutrient-card yzt-hidden" id="remote-nutrient-card">
+                <div class="rnc-title" id="rnc-title">氮含量等级</div>
+                <div class="rnc-list" id="rnc-list"></div>
+              </div>
+
+              <!-- 遥感墒情光谱轴 -->
+              <div class="yzt-remote-spectral-bar yzt-hidden" id="remote-spectral-bar">
+                <div class="rsb-title">土壤墒情</div>
+                <div class="rsb-gradient"></div>
+                <div class="rsb-labels"><span>60%</span><span>50%</span><span>40%</span><span>30%</span><span>20%</span><span>10%</span><span>0%</span></div>
+              </div>
+
+              <!-- 遥感土壤温度轴 -->
+              <div class="yzt-remote-temp-bar yzt-hidden" id="remote-temp-bar">
+                <div class="rtb-title">土壤温度 ℃</div>
+                <div class="rtb-gradient"></div>
+                <div class="rtb-labels"><span>40</span><span>35</span><span>30</span><span>25</span><span>20</span><span>15</span><span>10</span><span>5</span><span>0</span><span>-5</span><span>-10</span></div>
+              </div>
+
+              <!-- 遥感长势/估值等级卡片 -->
+              <div class="yzt-remote-quality-card yzt-hidden" id="remote-quality-card">
+                <div class="rqc-title" id="rqc-title">作物长势等级</div>
+                <div class="rqc-list" id="rqc-list"></div>
+              </div>
+
+              <!-- 遥感监测报告卡片 -->
+              <div class="yzt-rs-report-panel yzt-hidden" id="rs-report-panel">
+                <button class="yzt-rs-report-toggle" id="rs-report-toggle" title="收起">◀</button>
+                <div class="yzt-rs-report-inner">
+                  <div class="yzt-rs-report-header">
+                    <span class="yzt-rs-report-icon">📄</span>
+                    <span class="yzt-rs-report-title">遥感监测报告</span>
+                    <span class="yzt-rs-report-count">共8份</span>
+                  </div>
+                  <div class="yzt-rs-report-body" id="rs-report-body">
+                    <!-- JS 动态生成 -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- PDF查看弹窗 -->
+              <div class="yzt-pdf-viewer-overlay hidden" id="pdf-viewer-overlay">
+                <div class="yzt-pdf-viewer-bg"></div>
+                <div class="yzt-pdf-viewer-dialog">
+                  <div class="yzt-pdf-viewer-head">
+                    <h3 id="pdf-viewer-title">遥感监测报告</h3>
+                    <div class="yzt-pdf-viewer-actions">
+                      <button class="yzt-pdf-viewer-fs" id="pdf-viewer-fs" title="全屏">⛶</button>
+                      <button class="yzt-pdf-viewer-close" id="pdf-viewer-close">×</button>
+                    </div>
+                  </div>
+                  <div class="yzt-pdf-viewer-body">
+                    <iframe id="pdf-viewer-iframe" class="yzt-pdf-viewer-iframe" src=""></iframe>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 地块信息卡片（选中地块后显示） -->
+              <div class="yzt-plot-info-card yzt-hidden" id="plot-info-card">
+                <div class="pic-close" id="pic-close">×</div>
+                <div class="pic-head">
+                  <div class="pic-title" id="pic-title">—</div>
+                  <span class="pic-tag" id="pic-tag">统种地</span>
+                  <span class="pic-crop-badge" id="pic-crop-badge"></span>
+                </div>
+                <!-- 地块基础信息 -->
+                <div class="pic-section">
+                  <div class="pic-section-title">地块基础信息</div>
+                  <div class="pic-info-grid pic-info-grid-2" id="pic-basic-grid"></div>
+                </div>
+                <!-- 田间作业档案 / 经营统计 Tab 切换 -->
+                <div class="pic-tabs" id="pic-tabs">
+                  <button class="pic-tab active" data-ptab="archive">田间作业档案</button>
+                  <button class="pic-tab" data-ptab="biz">经营统计</button>
+                </div>
+                <div class="pic-panel active" id="pic-panel-archive">
+                  <div class="pic-archive-body" id="pic-archive-body"></div>
+                </div>
+                <div class="pic-panel" id="pic-panel-biz">
+                  <div class="pic-biz-body" id="pic-biz-body"></div>
+                </div>
+                <!-- 承租地PDF合同入口 -->
+                <div class="pic-contract-row yzt-hidden" id="pic-contract-row">
+                  <button class="pic-contract-btn" id="pic-contract-btn">📄 查看承租合同PDF</button>
+                </div>
+              </div>
+
+              <div class="yzt-map-toolbar">
+                <button class="yzt-map-tool" id="map-zoom-in" title="放大">+</button>
+                <button class="yzt-map-tool" id="map-zoom-out" title="缩小">−</button>
+                <button class="yzt-map-tool" id="map-reset" title="复位">◎</button>
+                <button class="yzt-map-tool" id="map-fullscreen" title="全屏">⛶</button>
+                <button class="yzt-map-tool yzt-hidden" id="legend-toggle" title="图例总览">☰</button>
+              </div>
+
+              <div class="yzt-map-weather-float hidden" id="map-weather-float">
+                <div class="yzt-weather-float-row">
+                  <div class="yzt-weather-float-head">
+                    <span>气象监测</span>
+                    <button type="button" class="yzt-weather-float-close" id="weather-float-close" title="关闭">×</button>
+                  </div>
+                  <div class="yzt-weather-float-scope" id="map-weather-scope"></div>
+                  <div class="yzt-weather-float-body" id="map-weather-body"></div>
+                  <div class="yzt-weather-forecast" id="map-weather-forecast"></div>
+                </div>
+              </div>
+
+              <!-- 灾害实时播报条 -->
+              <div class="yzt-disaster-ticker yzt-hidden" id="disaster-ticker">
+                <div class="dt-label">⚠ 灾害预警</div>
+                <div class="dt-marquee" id="dt-marquee"></div>
+              </div>
+
+              <!-- IoT告警实时播报条 -->
+              <div class="yzt-iot-ticker yzt-hidden" id="iot-ticker">
+                <div class="it-label">⚡ 设备告警</div>
+                <div class="it-marquee" id="it-marquee"></div>
+              </div>
+
+              <div class="yzt-map-land-stats" id="map-land-stats" aria-live="polite"></div>
+              <div class="yzt-map-parcel-click-hint yzt-hidden" id="map-parcel-click-hint" aria-hidden="true">点击地块查看详情</div>
+
+
+
+              <!-- 地图 · 遥感图层透明度调节 -->
+              <div class="yzt-map-remote-slider-wrap hidden" id="map-remote-slider-wrap">
+                <span class="yzt-remote-slider-label" id="remote-slider-label">图层透明度</span>
+                <div class="yzt-remote-slider">
+                  <input type="range" id="remote-opacity-slider" min="10" max="100" value="65" step="5">
+                  <span class="val" id="remote-opacity-val">65%</span>
+                </div>
+              </div>
+              <!-- 镇南组织结构拉手 + 面板 -->
+              <div class="yzt-org-handle yzt-hidden" id="org-handle" title="镇南组织结构">
+                <span class="org-handle-text">示范产业园区</span>
+              </div>
+              <div class="yzt-org-panel yzt-hidden" id="org-panel">
+                <div class="org-close" id="org-close">×</div>
+                <div class="org-panel-content">
+                  <div class="org-img-wrap">
+                    <img src="assets/park-demo.png" alt="示范产业园区" class="org-img">
+                  </div>
+                  <div class="org-grid" id="org-grid"></div>
+                  <div class="org-detail" id="org-detail"></div>
+                </div>
+              </div>
+              <!-- 宗地明细拉手 -->
+              <div class="yzt-parcel-table-handle" id="parcel-table-handle" title="宗地明细">
+                <span class="parcel-table-handle-text">宗地明细</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- 右栏 15% -->
+          <aside class="yzt-side yzt-side-right">
+            <!-- 土地资源 / 物联网：整块为数据分析 -->
+            <div class="yzt-right-analysis" id="yzt-right-analysis">
+              <div class="yzt-side-label yzt-hidden" id="right-analysis-label" aria-hidden="true"></div>
+              <div class="yzt-iot-right-panel yzt-hidden" id="yzt-iot-right-panel">
+                <!-- 站点设备信息 -->
+                <div class="yzt-iot-right-module">
+                  <div class="yzt-iot-section-title">站点设备信息</div>
+                  <div id="iot-station-info" class="yzt-iot-station-info"></div>
+                </div>
+                <!-- 历史监测数据 -->
+                <div class="yzt-iot-right-module">
+                  <div class="yzt-iot-section-title">历史监测数据</div>
+                  <div id="iot-right-line-chart" class="yzt-side-chart yzt-iot-rchart"></div>
+                </div>
+                <!-- 实时告警 -->
+                <div class="yzt-iot-right-module">
+                  <div class="yzt-iot-section-title">实时告警</div>
+                  <div class="yzt-iot-alert-list" id="iot-alert-list"></div>
+                </div>
+              </div>
+              <div class="yzt-land-chart-list" id="right-charts-wrap">
+                <div class="yzt-land-chart-block">
+                  <div class="yzt-land-chart-head">
+                    <div class="yzt-land-chart-title"></div>
+                  </div>
+                  <div id="right-chart-cert-pie" class="yzt-land-viz"></div>
+                </div>
+                <div class="yzt-land-chart-block">
+                  <div class="yzt-land-chart-head">
+                    <div class="yzt-land-chart-title"></div>
+                  </div>
+                  <div id="right-chart-cert-status" class="yzt-land-viz"></div>
+                </div>
+                <div class="yzt-land-chart-block yzt-land-chart-block--progress">
+                  <div class="yzt-land-chart-head yzt-land-chart-head--stack">
+                    <div class="yzt-land-chart-title">各行政区确权占比</div>
+                    <div class="yzt-land-chart-sub yzt-land-village-alert-line" id="land-village-bars-conclusion"></div>
+                  </div>
+                  <div id="land-region-cards" class="yzt-land-viz yzt-land-region-cards"></div>
+                </div>
+              </div>
+            </div>
+            <!-- 种植经营：右侧面板 -->
+            <div class="yzt-right-plant-detail yzt-hidden" id="yzt-right-detail-section">
+              <!-- 图一：各农场承租 + 统种占比 -->
+              <div class="yzt-plant-right-block" id="plant-farm-rent-ratio-block" style="flex:1.4;">
+                <div class="yzt-plant-right-chart-head">各农场承租/统种占比</div>
+                <div id="farm-rent-ratio-list" class="yzt-side-chart" style="flex:1;min-height:0;overflow:hidden"></div>
+              </div>
+              <!-- 图二：各农场整体进度 + 春播/夏管/秋收 Tab -->
+              <div class="yzt-plant-right-block" id="plant-season-progress-block" style="flex:2;">
+                <div class="yzt-plant-right-chart-head">各农场整体进度</div>
+                <div class="season-progress-tabs" id="season-tabs">
+                  <button class="sp-tab active" data-season="sowing">春播</button>
+                  <button class="sp-tab" data-season="summer">夏管</button>
+                  <button class="sp-tab" data-season="harvest">秋收</button>
+                </div>
+                <div id="season-progress-body" class="sp-body" style="flex:1;min-height:0;overflow:hidden"></div>
+              </div>
+              <!-- 图三：各农场累计投入 Tab切换 -->
+              <div class="yzt-plant-right-block yzt-plant-farm-invest" id="plant-farm-invest-block">
+                <div class="yzt-plant-right-chart-head">各农场累计投入</div>
+                <div class="season-progress-tabs" id="invest-farm-tabs">
+                  <button class="sp-tab active" data-invest="农资">农资</button>
+                  <button class="sp-tab" data-invest="农机">农机</button>
+                  <button class="sp-tab" data-invest="其他">其他</button>
+                </div>
+                <div id="farm-invest-body" style="flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none"></div>
+              </div>
+              <!-- 气象监测 -->
+              <div class="yzt-plant-right-block yzt-hidden" id="plant-weather-block">
+                <div class="yzt-weather-year-tabs" id="weather-right-year-tabs">
+                  <button class="yzt-weather-year-tab active" data-wy="thisYear">近一年</button>
+                  <button class="yzt-weather-year-tab" data-wy="fiveYear">近五年</button>
+                </div>
+                <div class="yzt-plant-right-chart-head">积温变化</div>
+                <div id="weather-right-acc-temp-chart" class="yzt-side-chart yzt-weather-chart"></div>
+                <div class="yzt-plant-right-chart-head">积雨变化</div>
+                <div id="weather-right-acc-rain-chart" class="yzt-side-chart yzt-weather-chart"></div>
+                <div class="yzt-plant-right-chart-head">ET₀ 参考作物蒸发散发变化</div>
+                <div id="weather-right-et0-chart" class="yzt-side-chart yzt-weather-chart"></div>
+              </div>
+            </div>
+          </aside>
+        </main>
+
+        <!-- 弹窗 -->
+        <div id="yzt-modal-overlay" class="yzt-modal-overlay hidden">
+          <div class="yzt-modal">
+            <div class="yzt-modal-header">
+              <div>
+                <h2 id="yzt-modal-title">—</h2>
+                <p id="yzt-modal-sub">—</p>
+              </div>
+              <button class="yzt-modal-close" id="yzt-modal-close">×</button>
+            </div>
+            <div class="yzt-modal-body" id="yzt-modal-body"></div>
+          </div>
+        </div>
+
+        <!-- 宗地地块详情（土地资源下钻 · 点击图斑） -->
+        <div id="yzt-parcel-detail-overlay" class="yzt-parcel-detail-overlay hidden" aria-hidden="true">
+          <div class="yzt-parcel-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="yzt-parcel-detail-title">
+            <header class="yzt-parcel-detail-head">
+              <div>
+                <h2 id="yzt-parcel-detail-title" class="yzt-parcel-detail-title">地块详情</h2>
+                <p id="yzt-parcel-detail-farm" class="yzt-parcel-detail-farm"></p>
+              </div>
+              <button type="button" class="yzt-parcel-detail-x" id="yzt-parcel-detail-close" aria-label="关闭">×</button>
+            </header>
+            <div class="yzt-parcel-detail-main">
+              <div class="yzt-parcel-detail-preview">
+                <div id="yzt-parcel-detail-map" class="yzt-parcel-detail-map" aria-hidden="true"></div>
+              </div>
+              <div class="yzt-parcel-detail-side">
+                <div class="yzt-parcel-detail-tabs" role="tablist">
+                  <button type="button" class="yzt-parcel-detail-tab active" data-pd-tab="basic" role="tab" aria-selected="true">基本信息</button>
+                  <button type="button" class="yzt-parcel-detail-tab" data-pd-tab="parcel" role="tab" aria-selected="false">宗地信息</button>
+                  <button type="button" class="yzt-parcel-detail-tab" data-pd-tab="cert" role="tab" aria-selected="false">权证信息</button>
+                  <button type="button" class="yzt-parcel-detail-tab" data-pd-tab="book" role="tab" aria-selected="false">证书信息</button>
+                </div>
+                <div class="yzt-parcel-detail-panels">
+                  <div class="yzt-parcel-detail-panel active" data-pd-panel="basic" role="tabpanel" id="yzt-pd-panel-basic"></div>
+                  <div class="yzt-parcel-detail-panel" data-pd-panel="parcel" role="tabpanel" id="yzt-pd-panel-parcel"></div>
+                  <div class="yzt-parcel-detail-panel" data-pd-panel="cert" role="tabpanel" id="yzt-pd-panel-cert"></div>
+                  <div class="yzt-parcel-detail-panel" data-pd-panel="book" role="tabpanel" id="yzt-pd-panel-book"></div>
+                </div>
+              </div>
+            </div>
+            <footer class="yzt-parcel-detail-foot">
+              <button type="button" class="yzt-parcel-detail-btn-close" id="yzt-parcel-detail-btn-close">关闭</button>
+            </footer>
+          </div>
+        </div>
+
+        <!-- 设备详情弹窗（物联网设备下钻） -->
+        <div id="yzt-device-detail-overlay" class="yzt-parcel-detail-overlay hidden" aria-hidden="true">
+          <div class="yzt-parcel-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="yzt-device-detail-title">
+            <header class="yzt-parcel-detail-head">
+              <div>
+                <h2 id="yzt-device-detail-title" class="yzt-parcel-detail-title">设备详情</h2>
+                <p id="yzt-device-detail-sub" class="yzt-parcel-detail-farm"></p>
+              </div>
+              <button type="button" class="yzt-parcel-detail-x" id="yzt-device-detail-close" aria-label="关闭">×</button>
+            </header>
+            <div class="yzt-parcel-detail-main">
+              <div class="yzt-parcel-detail-preview">
+                <div id="yzt-device-detail-map" class="yzt-parcel-detail-map" aria-hidden="true"></div>
+              </div>
+              <div class="yzt-parcel-detail-side">
+                <div class="yzt-parcel-detail-tabs" role="tablist" id="yzt-device-detail-tabs">
+                  <button type="button" class="yzt-parcel-detail-tab active" data-dd-tab="realtime" role="tab" aria-selected="true">实时数据</button>
+                  <button type="button" class="yzt-parcel-detail-tab" data-dd-tab="control" role="tab" aria-selected="false">远程控制</button>
+                </div>
+                <div class="yzt-parcel-detail-panels" id="yzt-device-detail-panels">
+                  <div class="yzt-parcel-detail-panel active" data-dd-panel="realtime" role="tabpanel" id="dd-panel-realtime"></div>
+                  <div class="yzt-parcel-detail-panel" data-dd-panel="control" role="tabpanel" id="dd-panel-control"></div>
+                </div>
+              </div>
+            </div>
+            <footer class="yzt-parcel-detail-foot">
+              <button type="button" class="yzt-parcel-detail-btn-close" id="yzt-device-detail-btn-close">关闭</button>
+            </footer>
+          </div>
+        </div>
+
+        <div id="legend-overlay" class="yzt-modal-overlay yzt-legend-modal hidden">
+          <div class="yzt-modal">
+            <div class="yzt-modal-header">
+              <div><h2>图例总览</h2><p>各图层颜色含义</p></div>
+              <button class="yzt-modal-close" id="legend-close">×</button>
+            </div>
+            <div class="yzt-modal-body">
+              <div class="yzt-legend-grid" id="legend-content"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 宗地明细表格弹窗 -->
+        <div id="parcel-table-overlay" class="yzt-modal-overlay hidden">
+          <div class="yzt-modal yzt-parcel-table-modal">
+            <div class="yzt-modal-header">
+              <div>
+                <h2 id="parcel-table-title">宗地明细</h2>
+                <p id="parcel-table-sub">土地资源地块数据</p>
+              </div>
+              <button class="yzt-modal-close" id="parcel-table-close">×</button>
+            </div>
+            <div class="yzt-modal-body" style="padding:0">
+              <div class="yzt-parcel-table-wrap">
+                <table class="yzt-parcel-table" id="parcel-table">
+                  <thead>
+                    <tr>
+                      <th>序号</th>
+                      <th>宗地名称</th>
+                      <th>地块编码</th>
+                      <th>面积(亩)</th>
+                      <th>权籍类型</th>
+                      <th>用地类型</th>
+                      <th>确权状态</th>
+                      <th>承包方</th>
+                      <th>权证到期日</th>
+                    </tr>
+                  </thead>
+                  <tbody id="parcel-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="yzt-context-menu" id="device-context">
+          <button data-action="view-detail">查看详情</button>
+          <button data-action="toggle-valve">远程开关水阀</button>
+          <button data-action="reboot">远程重启</button>
+          <button data-action="close">关闭</button>
+        </div>
+
+        <!-- 隐藏：底栏定位（逻辑保留） -->
+        <div class="yzt-hidden" id="farm-locate" data-placeholder="农场快速定位"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 交互说明弹窗（演示专用，非系统UI） -->
+  <div id="help-overlay" class="yzt-help-overlay hidden">
+    <div class="yzt-help-dialog">
+      <div class="yzt-help-head">
+        <h2>📋 交互说明</h2>
+        <span class="yzt-help-badge">演示专用 · 非系统UI</span>
+        <button id="help-close" class="yzt-help-close">×</button>
+      </div>
+      <div class="yzt-help-tabs">
+        <button class="yzt-help-tab active" data-htab="land">土地资源</button>
+        <button class="yzt-help-tab" data-htab="iot">物联网设备</button>
+        <button class="yzt-help-tab" data-htab="plant">种植经营</button>
+      </div>
+      <div class="yzt-help-body">
+        <div class="yzt-help-panel active" data-hpanel="land">
+          <h4>🗺️ 地图</h4>
+          <ul>
+            <li>点击农场圆点 → 飞到该农场，圆点消失只留宗地边界；点缩放按钮或切Tab恢复</li>
+            <li>点击宗地图斑 → 弹出详情（基本信息 / 宗地 / 权证 / 证书）</li>
+            <li>悬停圆点或图斑 → 显示 tooltip</li>
+            <li>滚轮缩放，拖拽平移</li>
+          </ul>
+          <h4>🔍 筛选</h4>
+          <ul>
+            <li>地图上的图例色块可点击，按确权状态或用地类型过滤图斑，再次点击取消</li>
+          </ul>
+          <h4>🛠️ 工具</h4>
+          <ul>
+            <li>缩放按钮 + / −，全屏按钮 ⛶</li>
+            <li>「宗地明细」拉手 → 弹出地块表格</li>
+          </ul>
+          <h4>📊 侧栏</h4>
+          <ul>
+            <li>左：确权KPI / 面积瀑布图 / 土地利用环形图</li>
+            <li>右：农场土地类型梯田图 / 确权对比环形图 / 行政区确权进度条</li>
+          </ul>
+        </div>
+        <div class="yzt-help-panel" data-hpanel="iot">
+          <h4>🗺️ 地图</h4>
+          <ul>
+            <li>农场圆点 → 点击飞到农场后消失，缩放或切Tab恢复</li>
+            <li>设备卡片 → 悬停看tooltip，点击弹出详情（实时数据 + 远程控制）</li>
+            <li>滚轮缩放，拖拽平移</li>
+          </ul>
+          <h4>🔍 筛选</h4>
+          <ul>
+            <li>点击左侧设备类型卡片筛选设备</li>
+            <li>按在线 / 离线 / 异常状态过滤</li>
+          </ul>
+          <h4>🛠️ 工具</h4>
+          <ul>
+            <li>缩放按钮 + / −，全屏按钮 ⛶</li>
+          </ul>
+          <h4>📊 侧栏</h4>
+          <ul>
+            <li>左：设备总数+告警KPI / 设备类型列表</li>
+            <li>右：设备信息 / 历史折线图 / 告警列表</li>
+          </ul>
+        </div>
+        <div class="yzt-help-panel" data-hpanel="plant">
+          <h4>🗺️ 地图</h4>
+          <ul>
+            <li>点击地块图斑 → 飞到地块，弹出信息卡片</li>
+            <li>统种地卡片：田间作业档案（收获 + 旋耕→播种→施肥→植保→灌溉→收割时间线）+ 经营统计</li>
+            <li>承租地卡片：承租基本信息 + 查看合同PDF按钮</li>
+            <li>农场圆点 → 点击飞到农场后消失，缩放或切Tab恢复</li>
+            <li>滚轮缩放，拖拽平移</li>
+          </ul>
+          <h4>🎬 场景切换</h4>
+          <ul>
+            <li>🌱 作物分布：默认模式，地块着色+作物图标，侧栏展示种植数据</li>
+            <li>🛰 遥感监测：侧栏隐藏全屏，8个指标切换，色标栏+报告面板+透明度滑块</li>
+            <li>🌤 气象监测：侧栏切为气象图表（可切换近一年/五年），色标栏+数据面板+浮动面板</li>
+          </ul>
+          <h4>🔍 筛选</h4>
+          <ul>
+            <li>农场切换、年份下拉、搜索地块名称、列表点击飞至</li>
+            <li>点击统种地/承租地图例 → 互斥筛选，再点恢复全部</li>
+          </ul>
+          <h4>🛠️ 工具</h4>
+          <ul>
+            <li>缩放按钮 + / −，全屏按钮 ⛶</li>
+            <li>遥感模式：图层透明度滑块</li>
+          </ul>
+          <h4>📊 侧栏（作物分布模式）</h4>
+          <ul>
+            <li>左：种植计划+进度表 / 农艺配方列表 / 累计投入饼图</li>
+            <li>右：承租统种占比 / 整体进度（春播夏管秋收切换）/ 累计投入（农资农机其他切换）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/yizhangtu-data.js"></script>
+  <script src="js/yizhangtu-plant-data.js"></script>
+  <script src="js/yizhangtu-plant.js"></script>
+  <script src="js/yizhangtu.js"></script>
+</body>
+</html>

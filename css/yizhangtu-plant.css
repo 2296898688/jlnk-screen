@@ -1,0 +1,782 @@
+/* 种植经营 — 子标签与模块样式（严格沿用土地资源三分栏视觉风格） */
+
+/* ===== 子标签栏（地图底部第二行） ===== */
+.yzt-sub-tabbar {
+  position: absolute;
+  left: 50%;
+  bottom: 88px;
+  transform: translateX(-50%);
+  z-index: 926;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(6, 16, 28, 0.42);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  pointer-events: auto;
+}
+
+.yzt-sub-tabbar.hidden {
+  display: none;
+}
+
+.yzt-map-wrap.weather-active .yzt-sub-tabbar {
+  bottom: 146px;
+}
+
+.yzt-sub-tab {
+  min-width: 160px;
+  min-height: 56px;
+  padding: 12px 28px;
+  font-size: 40px;
+  font-family: var(--font-ui, "Noto Sans SC", "Microsoft YaHei", sans-serif);
+  font-weight: 600;
+  color: var(--text-secondary, rgba(170, 210, 240, 0.75));
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border, rgba(0, 255, 160, 0.18));
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.yzt-sub-tab:hover {
+  border-color: var(--accent-cyan, #00D4FF);
+  color: var(--accent-cyan, #00D4FF);
+}
+
+.yzt-sub-tab.active {
+  color: rgba(220, 255, 240, 0.98);
+  border-color: rgba(0, 200, 120, 0.95);
+  background: linear-gradient(180deg, rgba(0, 110, 72, 0.72) 0%, rgba(0, 48, 32, 0.88) 100%);
+  font-weight: 800;
+  box-shadow: 0 0 20px rgba(0, 255, 160, 0.18), inset 0 1px 0 rgba(0, 255, 180, 0.12);
+}
+
+/* ===== 种植经营 · 左侧筛选面板 ===== */
+.yzt-plant-filter-section {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 4px 8px;
+  border-bottom: 1px solid rgba(0, 255, 160, 0.12);
+}
+
+.yzt-plant-filter-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.yzt-plant-filter-row .yzt-select {
+  flex: 1;
+  min-width: 100px;
+}
+
+.yzt-plant-filter-row .yzt-select-trigger {
+  font-size: 34px !important;
+  padding: 6px 10px !important;
+}
+
+.yzt-plant-filter-row .yzt-select-dropdown-head {
+  font-size: 30px !important;
+}
+
+.yzt-plant-filter-row .yzt-select-option {
+  font-size: 30px !important;
+}
+
+.yzt-plant-filter-row .yzt-filter-input {
+  font-size: 34px !important;
+  padding: 6px 10px 6px 30px !important;
+}
+
+.yzt-plant-btn-sm {
+  padding: 6px 14px;
+  font-size: 34px;
+  font-family: var(--font-ui, "Noto Sans SC", "Microsoft YaHei", sans-serif);
+  font-weight: 600;
+  color: var(--accent-cyan, #00D4FF);
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.yzt-plant-btn-sm:hover {
+  background: rgba(0, 212, 255, 0.18);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.15);
+}
+
+.yzt-plant-btn-sm.warn {
+  color: var(--yzt-c-warn, #FF9F1C);
+  border-color: rgba(255, 159, 28, 0.4);
+  background: rgba(255, 159, 28, 0.08);
+}
+
+.yzt-plant-btn-sm.warn:hover {
+  background: rgba(255, 159, 28, 0.18);
+  box-shadow: 0 0 12px rgba(255, 159, 28, 0.15);
+}
+
+.yzt-plant-btn-sm.danger {
+  color: #FF6B6B;
+  border-color: rgba(255, 107, 107, 0.4);
+  background: rgba(255, 107, 107, 0.08);
+}
+
+.yzt-plant-btn-sm.danger:hover {
+  background: rgba(255, 107, 107, 0.18);
+  box-shadow: 0 0 12px rgba(255, 107, 107, 0.15);
+}
+
+/* ===== 选中地块信息增强（种植经营） ===== */
+.yzt-plot-detail-extra {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.yzt-plot-detail-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.yzt-plot-detail-progress .prog-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 34px;
+  color: var(--text-secondary, rgba(170, 210, 240, 0.75));
+}
+
+.yzt-plot-detail-progress .prog-head .pct {
+  color: var(--accent-cyan, #00D4FF);
+  font-family: var(--font-num, "Noto Sans SC", sans-serif);
+  font-weight: 700;
+}
+
+.yzt-plot-detail-progress .prog-bar-wrap {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.yzt-plot-detail-progress .prog-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s;
+}
+
+.yzt-plot-detail-progress .prog-bar-fill.green {
+  background: linear-gradient(90deg, var(--accent-green, #00FF88), var(--accent-cyan, #00D4FF));
+}
+
+.yzt-plot-detail-progress .prog-bar-fill.orange {
+  background: linear-gradient(90deg, #FF9F1C, #FF6B6B);
+}
+
+.yzt-plot-detail-row .val.warn {
+  color: #FF9F1C;
+  font-weight: 700;
+}
+
+.yzt-plot-detail-row .val.danger {
+  color: #FF6B6B;
+  font-weight: 700;
+}
+
+/* ===== 右栏 · 种植经营图表容器 ===== */
+.yzt-right-plant-charts {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.yzt-right-plant-chart-block {
+  flex: 1;
+  min-height: 120px;
+  background: linear-gradient(135deg, rgba(0, 40, 32, 0.55) 0%, rgba(0, 0, 0, 0.35) 100%);
+  border: 1px solid rgba(0, 80, 56, 0.55);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.yzt-right-plant-chart-head {
+  flex-shrink: 0;
+  padding: 8px 10px 4px;
+  font-size: 36px;
+  font-weight: 700;
+  color: #00FF88;
+  border-left: 3px solid #00D4FF;
+  text-shadow: 0 0 12px rgba(0, 255, 136, 0.25);
+}
+
+.yzt-right-plant-chart-viz {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* 进度条列表 */
+.yzt-plant-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 12px;
+}
+
+.yzt-plant-progress-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.yzt-plant-progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 34px;
+}
+
+.yzt-plant-progress-head .name {
+  color: rgba(200, 220, 235, 0.88);
+  font-weight: 600;
+}
+
+.yzt-plant-progress-head .pct {
+  color: #00D4FF;
+  font-family: var(--font-num, "Noto Sans SC", sans-serif);
+  font-weight: 700;
+  font-size: 30px;
+}
+
+.yzt-plant-bar-wrap {
+  height: 28px;
+  background: rgba(74, 85, 104, 0.35);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.yzt-plant-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+
+.yzt-plant-bar-fill.green {
+  background: linear-gradient(90deg, #00A86B, #00FF88);
+}
+
+.yzt-plant-bar-fill.cyan {
+  background: linear-gradient(90deg, #00B4D8, #00D4FF);
+}
+
+.yzt-plant-bar-fill.orange {
+  background: linear-gradient(90deg, #FF9F1C, #FFB800);
+}
+
+.yzt-plant-bar-fill.red {
+  background: linear-gradient(90deg, #FF6B6B, #FF4444);
+}
+
+/* 图例渐变条 */
+.yzt-legend-gradient-wrap {
+  padding: 8px 14px 4px;
+}
+
+.yzt-legend-gradient-label {
+  font-size: 32px;
+  font-weight: 600;
+  color: rgba(200, 230, 255, 0.82);
+  margin-bottom: 6px;
+}
+
+.yzt-legend-gradient-bar {
+  height: 20px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.yzt-legend-gradient-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 30px;
+  color: rgba(180, 210, 235, 0.72);
+}
+
+/* 灾害预警列表 */
+.yzt-alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 10px;
+  overflow-y: auto;
+  max-height: 140px;
+}
+
+.yzt-alert-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 34px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.yzt-alert-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.yzt-alert-item.level-red {
+  background: rgba(255, 68, 68, 0.12);
+  border: 1px solid rgba(255, 68, 68, 0.35);
+}
+
+.yzt-alert-item.level-orange {
+  background: rgba(255, 159, 28, 0.08);
+  border: 1px solid rgba(255, 159, 28, 0.25);
+}
+
+.yzt-alert-item.level-yellow {
+  background: rgba(255, 184, 0, 0.06);
+  border: 1px solid rgba(255, 184, 0, 0.2);
+}
+
+.yzt-alert-item.level-blue {
+  background: rgba(0, 212, 255, 0.06);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.yzt-alert-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.yzt-alert-dot.red { background: #FF4444; box-shadow: 0 0 6px #FF4444; }
+.yzt-alert-dot.orange { background: #FF9F1C; box-shadow: 0 0 6px #FF9F1C; }
+.yzt-alert-dot.yellow { background: #FFB800; box-shadow: 0 0 6px #FFB800; }
+.yzt-alert-dot.blue { background: #00D4FF; box-shadow: 0 0 6px #00D4FF; }
+
+.yzt-alert-type {
+  color: rgba(200, 220, 235, 0.88);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.yzt-alert-text {
+  flex: 1;
+  color: rgba(180, 210, 235, 0.72);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yzt-alert-time {
+  color: rgba(160, 200, 220, 0.55);
+  font-size: 30px;
+  flex-shrink: 0;
+}
+
+/* 历史预警入口 */
+.yzt-history-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  font-size: 34px;
+  color: var(--accent-cyan, #00D4FF);
+  cursor: pointer;
+  border-top: 1px solid rgba(0, 212, 255, 0.15);
+  transition: background 0.15s;
+}
+
+.yzt-history-link:hover {
+  background: rgba(0, 212, 255, 0.08);
+}
+
+/* ===== 种植经营 · 左栏汇总卡（未选地块时的全域汇总） ===== */
+.yzt-plant-summary-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 4px 2px 8px;
+  flex-shrink: 0;
+}
+
+.yzt-plant-summary-card {
+  padding: 10px 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border, rgba(0, 255, 160, 0.18));
+  border-radius: 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.yzt-plant-summary-card .s-label {
+  font-size: 32px;
+  color: var(--text-secondary, rgba(170, 210, 240, 0.75));
+}
+
+.yzt-plant-summary-card .s-val {
+  font-size: 36px;
+  font-family: var(--font-num, "Noto Sans SC", sans-serif);
+  font-weight: 700;
+  color: var(--accent-cyan, #00D4FF);
+}
+
+.yzt-plant-summary-card .s-val.green {
+  color: var(--accent-green, #00FF88);
+}
+
+.yzt-plant-summary-card .s-val.warn {
+  color: #FF9F1C;
+}
+
+/* ===== 种植经营 · 气象模块左右切换 ===== */
+.yzt-weather-mode-tabs {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 2px 0 6px;
+}
+
+.yzt-weather-mode-btn {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 34px;
+  font-family: var(--font-ui, "Noto Sans SC", sans-serif);
+  font-weight: 600;
+  color: var(--text-secondary, rgba(170, 210, 240, 0.75));
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border, rgba(0, 255, 160, 0.18));
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.yzt-weather-mode-btn:hover {
+  border-color: var(--accent-cyan, #00D4FF);
+  color: var(--accent-cyan, #00D4FF);
+}
+
+.yzt-weather-mode-btn.active {
+  color: var(--accent-green, #00FF88);
+  border-color: var(--accent-green, #00FF88);
+  background: rgba(0, 255, 136, 0.1);
+}
+
+/* ===== 种植经营 · 地图遥感图层调节 ===== */
+.yzt-map-remote-slider-wrap {
+  position: absolute;
+  left: 16px;
+  bottom: 180px;
+  z-index: 905;
+  padding: 10px 14px;
+  background: rgba(6, 16, 28, 0.55);
+  border: 1px solid rgba(0, 229, 255, 0.28);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.yzt-map-remote-slider-wrap.hidden {
+  display: none;
+}
+
+.yzt-remote-slider-label {
+  font-size: 26px;
+  color: rgba(200, 230, 255, 0.88);
+  font-weight: 600;
+}
+
+.yzt-remote-slider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.yzt-remote-slider input[type="range"] {
+  width: 120px;
+  accent-color: var(--accent-green, #00FF88);
+}
+
+.yzt-remote-slider .val {
+  font-size: 28px;
+  font-family: var(--font-num, "Noto Sans SC", sans-serif);
+  color: var(--accent-cyan, #00D4FF);
+  min-width: 40px;
+  text-align: center;
+}
+
+/* 地块详情浮窗（地图上） */
+.yzt-map-plot-popup {
+  padding: 10px 14px;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.yzt-map-plot-popup .pop-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #00FF88;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(0, 255, 160, 0.2);
+}
+
+.yzt-map-plot-popup .pop-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 34px;
+}
+
+.yzt-map-plot-popup .pop-k {
+  color: rgba(170, 210, 240, 0.7);
+}
+
+.yzt-map-plot-popup .pop-v {
+  color: #e8f4ff;
+  font-family: var(--font-num, "Noto Sans SC", sans-serif);
+}
+
+/* 遥感统计数据表格 */
+.yzt-remote-stat-table {
+  padding: 6px 12px;
+  overflow-y: auto;
+}
+
+.yzt-remote-stat-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.yzt-remote-stat-table th {
+  font-size: 32px;
+  font-weight: 600;
+  color: rgba(200, 220, 235, 0.82);
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(0, 255, 160, 0.15);
+  text-align: center;
+}
+
+.yzt-remote-stat-table td {
+  font-size: 34px;
+  color: rgba(180, 210, 235, 0.78);
+  padding: 6px 8px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.yzt-remote-stat-table td.highlight {
+  color: var(--accent-green, #00FF88);
+  font-weight: 600;
+}
+
+/* 播种进度低亮地块提示 */
+.yzt-plot-chip.delayed .yzt-plot-chip-icon::before {
+  background: linear-gradient(180deg, rgba(255, 159, 28, 0.45), rgba(255, 159, 28, 0.1));
+  border-color: rgba(255, 159, 28, 0.5);
+  box-shadow: 0 0 10px rgba(255, 159, 28, 0.3);
+}
+
+.yzt-plot-chip.delayed .yzt-plot-chip-name {
+  color: #FFB800;
+}
+
+/* 地块hover高亮 */
+.yzt-plot-parcel:hover {
+  stroke: #ffffff !important;
+  stroke-width: 3 !important;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6)) !important;
+  cursor: pointer;
+}
+
+/* 土壤分层数据 */
+.yzt-soil-layer-table {
+  padding: 6px 8px;
+}
+
+.yzt-soil-layer-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.yzt-soil-layer-table th {
+  font-size: 32px;
+  font-weight: 600;
+  color: rgba(200, 220, 235, 0.82);
+  padding: 6px 6px;
+  border-bottom: 1px solid rgba(0, 255, 160, 0.15);
+  text-align: center;
+}
+
+.yzt-soil-layer-table td {
+  font-size: 34px;
+  color: rgba(180, 210, 235, 0.78);
+  padding: 6px 6px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* ===== Sci-Fi Chart Panel Enhancements ===== */
+
+/* 右栏图表区块发光边框 */
+.yzt-plant-right-block {
+  position: relative;
+  background: linear-gradient(180deg, rgba(0, 30, 24, 0.65) 0%, rgba(0, 8, 6, 0.55) 100%) !important;
+  border: 1px solid rgba(0, 200, 130, 0.3) !important;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.06), inset 0 1px 0 rgba(0, 255, 136, 0.06);
+}
+
+/* 区块顶部发光横线 */
+.yzt-plant-right-block::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 12px; right: 12px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.4), rgba(0, 212, 255, 0.3), transparent);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* 图表标题增强 */
+.yzt-plant-right-chart-head {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: #00FF88 !important;
+  text-shadow: 0 0 14px rgba(0, 255, 136, 0.35), 0 0 4px rgba(0, 212, 255, 0.25) !important;
+  padding: 10px 14px 6px !important;
+  border-left: 3px solid #00D4FF !important;
+}
+
+/* KPI 卡片发光 */
+.yzt-plant-summary-card {
+  background: rgba(0, 16, 12, 0.6) !important;
+  border: 1px solid rgba(0, 212, 255, 0.25) !important;
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.08);
+}
+
+/* 进度条增强 */
+.sp-overall-bar .sp-bar-track {
+  background: rgba(0, 229, 255, 0.08) !important;
+  border-radius: 6px;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+.sp-overall-bar .sp-bar-fill {
+  background: linear-gradient(90deg, #047857, #00FF88, #00D4FF) !important;
+  border-radius: 6px;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.4), 0 0 4px rgba(0, 212, 255, 0.3);
+  transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 进度条分段 */
+.yzt-progress-seg {
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.15);
+}
+
+/* 左侧年度种植计划面板 */
+.yzt-plant-annual-plan {
+  background: linear-gradient(180deg, rgba(0, 24, 18, 0.7) 0%, rgba(0, 6, 4, 0.6) 100%) !important;
+  border: 1px solid rgba(0, 200, 130, 0.28) !important;
+  border-radius: 8px;
+  box-shadow: 0 0 24px rgba(0, 255, 136, 0.05), inset 0 1px 0 rgba(0, 255, 136, 0.05);
+}
+
+/* 累计投入饼图面板 */
+.yzt-plant-invest-summary {
+  background: linear-gradient(180deg, rgba(0, 20, 16, 0.6) 0%, rgba(0, 6, 4, 0.5) 100%) !important;
+  border: 1px solid rgba(0, 200, 130, 0.22) !important;
+  border-radius: 8px;
+}
+
+/* 农艺配方表格面板 */
+.yzt-plant-formula-list {
+  background: linear-gradient(180deg, rgba(0, 20, 16, 0.55) 0%, rgba(0, 6, 4, 0.45) 100%) !important;
+  border: 1px solid rgba(0, 200, 130, 0.2) !important;
+  border-radius: 8px;
+}
+
+/* 面板标题通用增强 */
+.yzt-plot-panel-title {
+  font-size: 30px !important;
+  font-weight: 700 !important;
+  color: #00FF88 !important;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.3) !important;
+}
+
+/* Tab按钮发光 */
+.sp-tab.active {
+  color: #00FF88 !important;
+  border-color: rgba(0, 255, 136, 0.5) !important;
+  background: rgba(0, 255, 136, 0.08) !important;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.15);
+}
+
+.sp-tab:hover {
+  border-color: rgba(0, 212, 255, 0.45) !important;
+  color: #00D4FF !important;
+}
+
+/* 承租/统种 KPI 卡片增强 */
+.ap-kpi-rent {
+  background: linear-gradient(160deg, rgba(200, 150, 50, 0.32) 0%, rgba(60, 40, 10, 0.28) 100%) !important;
+  border: 1px solid rgba(255, 200, 80, 0.36) !important;
+  box-shadow: 0 0 16px rgba(255, 184, 0, 0.1);
+}
+
+.ap-kpi-self {
+  background: linear-gradient(160deg, rgba(0, 180, 130, 0.3) 0%, rgba(0, 50, 30, 0.25) 100%) !important;
+  border: 1px solid rgba(0, 220, 150, 0.35) !important;
+  box-shadow: 0 0 16px rgba(0, 255, 136, 0.1);
+}
+
+/* 数值字体增强 */
+.ap-kpi-val {
+  font-family: "Orbitron", "Noto Sans SC", sans-serif !important;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+/* 仪表盘容器 */
+.annual-plan-gauge {
+  position: relative;
+}
+
+/* 仪表盘外层光晕 */
+.annual-plan-gauge::before {
+  content: "";
+  position: absolute;
+  top: 8%; left: 8%; right: 8%; bottom: 8%;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 212, 255, 0.08);
+  pointer-events: none;
+  z-index: 1;
+}

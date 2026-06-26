@@ -1,0 +1,761 @@
+/* 农垦一张图 — 模拟数据（权限过滤后展示子集） */
+
+const PERMISSIONS = {
+  group: { label: "集团总部", farms: ["baicheng", "zhennan"] },
+  baicheng: { label: "白城牧场", farms: ["baicheng"] },
+  zhennan: { label: "镇南种羊场", farms: ["zhennan"] }
+};
+
+const LAND_RIGHT_TYPES = ["国有", "集体", "承包", "租赁"];
+const LAND_USE_TYPES = ["耕地", "草地", "林地", "建设用地", "水域", "其他"];
+const RENT_TYPES = ["统种地", "外租地", "个人地"];
+const SALINE_TYPES = ["轻度盐碱", "中度盐碱", "重度盐碱", "苏打盐碱"];
+const HIGH_STD_STATUS = ["已完成", "建设中", "规划中", "非高标"];
+
+const YZT_LAND_STATS = {
+  totalArea: 2480,
+  certified: { area: 1860, count: 892 },
+  registeredPending: { area: 320, count: 156 },
+  confirmedUnregistered: { area: 180, count: 98 },
+  unconfirmed: { area: 120, count: 140 },
+  inputArea: 2380,
+  drawArea: 2356,
+  useRightArea: 2320
+};
+
+const YZT_RENT_STATS = [
+  { type: "统种地", area: 1120, count: 486, color: "#00FF88" },
+  { type: "外租地", area: 680, count: 312, color: "#00D4FF" },
+  { type: "个人地", area: 420, count: 198, color: "#FFB800" }
+];
+
+const YZT_HIGH_STD = [
+  { status: "已完成", area: 860, count: 420, color: "#00FF88" },
+  { status: "建设中", area: 320, count: 156, color: "#00D4FF" },
+  { status: "规划中", area: 180, count: 88, color: "#FFB800" },
+  { status: "非高标", area: 1120, count: 622, color: "#6B7280" }
+];
+
+const YZT_SALINE = [
+  { type: "轻度盐碱", area: 280, count: 142, color: "#FFE066" },
+  { type: "中度盐碱", area: 156, count: 78, color: "#FF9F43" },
+  { type: "重度盐碱", area: 68, count: 32, color: "#FF6B6B" },
+  { type: "苏打盐碱", area: 42, count: 18, color: "#B388FF" }
+];
+
+const YZT_CROPS = [
+  { name: "玉米", area: 680, pct: 32, varieties: ["先玉335", "郑单958", "吉单27"] },
+  { name: "大豆", area: 420, pct: 20, varieties: ["吉农17", "东生7号"] },
+  { name: "水稻", area: 380, pct: 18, varieties: ["吉粳88", "通系933"] },
+  { name: "杂粮", area: 260, pct: 12, varieties: ["高粱", "谷子", "绿豆"] },
+  { name: "牧草", area: 220, pct: 10, varieties: ["苜蓿", "黑麦草"] },
+  { name: "其他", area: 168, pct: 8, varieties: ["中药材", "果蔬"] }
+];
+
+const YZT_PROGRESS = {
+  categories: ["粮食", "油料", "经济作物", "牧草", "杂粮"],
+  sowPlan: [820, 180, 120, 220, 260],
+  sowDone: [756, 168, 98, 198, 228],
+  harvestPlan: [780, 175, 110, 0, 0],
+  harvestDone: [620, 142, 86, 0, 0]
+};
+
+/** 物联网设备数量统计（全部录入设备） */
+const YZT_DEVICE_COUNTS = [
+  { name: "水质监测", count: 10, icon: "water", color: "#00B4D8" },
+  { name: "增氧机", count: 14, icon: "pump", color: "#00D4FF" },
+  { name: "水位监测", count: 40, icon: "level", color: "#48CAE4" },
+  { name: "尾水处理", count: 1, icon: "waste", color: "#90E0EF" },
+  { name: "摄像头", count: 35, icon: "camera", color: "#FFB800" },
+  { name: "气象站", count: 4, icon: "weather", color: "#FF9F1C" },
+  { name: "土壤墒情", count: 4, icon: "soil", color: "#B388FF" },
+  { name: "虫情测报灯", count: 4, icon: "insect", color: "#E040FB" },
+  { name: "杀虫灯", count: 60, icon: "lamp", color: "#7C4DFF" },
+  { name: "表型监测", count: 4, icon: "pheno", color: "#536DFE" },
+  { name: "变压器", count: 1, icon: "transformer", color: "#FF6B6B" },
+  { name: "北斗基站", count: 1, icon: "beidou", color: "#00FF88" }
+];
+
+const YZT_DEVICES = [
+  // ---- 气象站 (8) ----
+  { id: "ws001", name: "气象站-WS01", type: "气象站", farm: "白城牧场", lat: 45.625, lng: 122.842, online: true, status: "online",
+    value: "23.6°C", runtime: "1680h", lastReport: "2026-05-22 08:30:15",
+    readings: { temperature: 23.6, humidity: 68, windSpeed: 3.2, windDir: "东南", pressure: 1013.2, rainfall: 0.2 },
+    alerts: [] },
+  { id: "ws002", name: "气象站-WS02", type: "气象站", farm: "白城牧场", lat: 45.618, lng: 122.828, online: true, status: "online",
+    value: "22.1°C", runtime: "1650h", lastReport: "2026-05-22 08:28:42",
+    readings: { temperature: 22.1, humidity: 72, windSpeed: 2.8, windDir: "南", pressure: 1012.8, rainfall: 0.0 },
+    alerts: [] },
+  { id: "ws003", name: "气象站-WS03", type: "气象站", farm: "白城牧场", lat: 45.610, lng: 122.860, online: true, status: "online",
+    value: "24.8°C", runtime: "1720h", lastReport: "2026-05-22 08:31:02",
+    readings: { temperature: 24.8, humidity: 65, windSpeed: 4.1, windDir: "东北", pressure: 1013.5, rainfall: 0.0 },
+    alerts: [] },
+  { id: "ws004", name: "气象站-WS04", type: "气象站", farm: "镇南种羊场", lat: 45.850, lng: 123.205, online: true, status: "online",
+    value: "21.3°C", runtime: "1580h", lastReport: "2026-05-22 08:29:55",
+    readings: { temperature: 21.3, humidity: 70, windSpeed: 3.5, windDir: "西", pressure: 1013.0, rainfall: 0.5 },
+    alerts: [] },
+  { id: "ws005", name: "气象站-WS05", type: "气象站", farm: "镇南种羊场", lat: 45.842, lng: 123.215, online: true, status: "online",
+    value: "20.9°C", runtime: "1610h", lastReport: "2026-05-22 08:30:38",
+    readings: { temperature: 20.9, humidity: 74, windSpeed: 2.5, windDir: "东南", pressure: 1012.5, rainfall: 0.0 },
+    alerts: [] },
+  { id: "ws006", name: "气象站-WS06", type: "气象站", farm: "白城牧场", lat: 45.632, lng: 122.810, online: false, status: "offline",
+    value: "--", runtime: "1420h", lastReport: "2026-05-21 14:22:10",
+    readings: null,
+    alerts: [{ level: "warning", text: "设备离线超过12小时", time: "2026-05-22 02:22" }] },
+  { id: "ws007", name: "气象站-WS07", type: "气象站", farm: "镇南种羊场", lat: 45.858, lng: 123.190, online: true, status: "online",
+    value: "22.7°C", runtime: "1550h", lastReport: "2026-05-22 08:31:20",
+    readings: { temperature: 22.7, humidity: 69, windSpeed: 3.0, windDir: "北", pressure: 1013.1, rainfall: 0.1 },
+    alerts: [] },
+  { id: "ws008", name: "气象站-WS08", type: "气象站", farm: "白城牧场", lat: 45.605, lng: 122.845, online: true, status: "online",
+    value: "25.1°C", runtime: "1690h", lastReport: "2026-05-22 08:30:50",
+    readings: { temperature: 25.1, humidity: 62, windSpeed: 3.8, windDir: "西南", pressure: 1013.8, rainfall: 0.0 },
+    alerts: [] },
+  // ---- 土壤墒情站 (10) ----
+  { id: "sm001", name: "土壤墒情站-SM01", type: "土壤墒情站", farm: "白城牧场", lat: 45.628, lng: 122.835, online: true, status: "online",
+    value: "墒情 42%", runtime: "720h", lastReport: "2026-05-22 08:25:10",
+    readings: { soilMoist: 42, soilTemp: 18.4, soilPH: 6.8, conductivity: 0.82, depth10cm: 38, depth30cm: 45 },
+    alerts: [] },
+  { id: "sm002", name: "土壤墒情站-SM02", type: "土壤墒情站", farm: "白城牧场", lat: 45.622, lng: 122.822, online: true, status: "online",
+    value: "墒情 38%", runtime: "710h", lastReport: "2026-05-22 08:24:55",
+    readings: { soilMoist: 38, soilTemp: 19.1, soilPH: 7.0, conductivity: 0.75, depth10cm: 35, depth30cm: 40 },
+    alerts: [] },
+  { id: "sm003", name: "土壤墒情站-SM03", type: "土壤墒情站", farm: "白城牧场", lat: 45.615, lng: 122.855, online: true, status: "online",
+    value: "墒情 45%", runtime: "735h", lastReport: "2026-05-22 08:26:02",
+    readings: { soilMoist: 45, soilTemp: 18.0, soilPH: 6.5, conductivity: 0.88, depth10cm: 42, depth30cm: 48 },
+    alerts: [] },
+  { id: "sm004", name: "土壤墒情站-SM04", type: "土壤墒情站", farm: "镇南种羊场", lat: 45.848, lng: 123.210, online: true, status: "online",
+    value: "墒情 40%", runtime: "700h", lastReport: "2026-05-22 08:25:30",
+    readings: { soilMoist: 40, soilTemp: 19.5, soilPH: 7.2, conductivity: 0.70, depth10cm: 36, depth30cm: 42 },
+    alerts: [] },
+  { id: "sm005", name: "土壤墒情站-SM05", type: "土壤墒情站", farm: "镇南种羊场", lat: 45.840, lng: 123.200, online: false, status: "offline",
+    value: "--", runtime: "680h", lastReport: "2026-05-21 18:30:00",
+    readings: null,
+    alerts: [{ level: "warning", text: "设备离线超过12小时", time: "2026-05-22 06:30" }] },
+  { id: "sm006", name: "土壤墒情站-SM06", type: "土壤墒情站", farm: "白城牧场", lat: 45.630, lng: 122.818, online: true, status: "online",
+    value: "墒情 48%", runtime: "728h", lastReport: "2026-05-22 08:26:15",
+    readings: { soilMoist: 48, soilTemp: 17.8, soilPH: 6.9, conductivity: 0.85, depth10cm: 44, depth30cm: 50 },
+    alerts: [] },
+  { id: "sm007", name: "土壤墒情站-SM07", type: "土壤墒情站", farm: "镇南种羊场", lat: 45.855, lng: 123.195, online: true, status: "fault",
+    value: "传感器异常", runtime: "690h", lastReport: "2026-05-22 07:15:00",
+    readings: { soilMoist: 99, soilTemp: 99.9, soilPH: 0, conductivity: 9.99, depth10cm: 99, depth30cm: 99 },
+    alerts: [{ level: "danger", text: "传感器数据异常，请检修", time: "2026-05-22 07:15" }] },
+  { id: "sm008", name: "土壤墒情站-SM08", type: "土壤墒情站", farm: "白城牧场", lat: 45.608, lng: 122.850, online: true, status: "online",
+    value: "墒情 41%", runtime: "715h", lastReport: "2026-05-22 08:24:40",
+    readings: { soilMoist: 41, soilTemp: 18.6, soilPH: 6.7, conductivity: 0.78, depth10cm: 37, depth30cm: 43 },
+    alerts: [] },
+  { id: "sm009", name: "土壤墒情站-SM09", type: "土壤墒情站", farm: "镇南种羊场", lat: 45.862, lng: 123.208, online: true, status: "online",
+    value: "墒情 43%", runtime: "705h", lastReport: "2026-05-22 08:26:40",
+    readings: { soilMoist: 43, soilTemp: 18.9, soilPH: 7.1, conductivity: 0.80, depth10cm: 39, depth30cm: 44 },
+    alerts: [] },
+  { id: "sm010", name: "土壤墒情站-SM10", type: "土壤墒情站", farm: "白城牧场", lat: 45.620, lng: 122.860, online: true, status: "online",
+    value: "墒情 39%", runtime: "740h", lastReport: "2026-05-22 08:25:50",
+    readings: { soilMoist: 39, soilTemp: 18.2, soilPH: 6.6, conductivity: 0.77, depth10cm: 34, depth30cm: 41 },
+    alerts: [] },
+  // ---- 智能水阀 (4) ----
+  { id: "vl001", name: "智能水阀-VL01", type: "智能水阀", farm: "白城牧场", lat: 45.626, lng: 122.840, online: true, status: "online",
+    value: "开 68%", runtime: "126h", lastReport: "2026-05-22 08:32:00",
+    readings: { openPct: 68, flowRate: 2.4, pressure: 0.35, totalFlow: 1280.5 },
+    alerts: [{ level: "info", text: "流量低于正常范围", time: "2026-05-22 06:00" }] },
+  { id: "vl002", name: "智能水阀-VL02", type: "智能水阀", farm: "白城牧场", lat: 45.612, lng: 122.832, online: true, status: "online",
+    value: "开 100%", runtime: "132h", lastReport: "2026-05-22 08:31:45",
+    readings: { openPct: 100, flowRate: 3.8, pressure: 0.42, totalFlow: 2150.2 },
+    alerts: [] },
+  { id: "vl003", name: "智能水阀-VL03", type: "智能水阀", farm: "镇南种羊场", lat: 45.852, lng: 123.212, online: true, status: "online",
+    value: "开 55%", runtime: "118h", lastReport: "2026-05-22 08:30:20",
+    readings: { openPct: 55, flowRate: 1.9, pressure: 0.30, totalFlow: 980.3 },
+    alerts: [] },
+  { id: "vl004", name: "智能水阀-VL04", type: "智能水阀", farm: "镇南种羊场", lat: 45.845, lng: 123.202, online: false, status: "offline",
+    value: "--", runtime: "115h", lastReport: "2026-05-21 20:00:00",
+    readings: null,
+    alerts: [{ level: "warning", text: "设备离线超过8小时", time: "2026-05-22 04:00" }] },
+  // ---- 摄像头 (2) ----
+  { id: "ca001", name: "摄像头-CA01", type: "摄像头", farm: "白城牧场", lat: 45.630, lng: 122.844, online: true, status: "online",
+    value: "正常录像", runtime: "2200h", lastReport: "2026-05-22 08:32:10",
+    readings: { resolution: "1080P", fps: 25, storageUsed: 68, signalStrength: 92 },
+    alerts: [] },
+  { id: "ca002", name: "摄像头-CA02", type: "摄像头", farm: "镇南种羊场", lat: 45.860, lng: 123.205, online: true, status: "online",
+    value: "正常录像", runtime: "2180h", lastReport: "2026-05-22 08:31:55",
+    readings: { resolution: "1080P", fps: 25, storageUsed: 72, signalStrength: 88 },
+    alerts: [] }
+];
+
+/** 设备告警汇总列表（供右侧面板展示） */
+const YZT_DEVICE_ALERTS = [
+  { id: "da001", deviceId: "vl001", deviceName: "智能水阀-VL01", level: "info", title: "流量异常", text: "智能水阀-VL03 流量低于正常范围，当前1.9m³/h", time: "2026-05-22 13:40" },
+  { id: "da002", deviceId: "sm007", deviceName: "土壤墒情站-SM07", level: "danger", title: "数据异常", text: "土壤墒情站-SM07 传感器数据异常，所有读数超出正常范围", time: "2026-05-22 12:15" }
+];
+
+/** 设备筛选状态 */
+const YZT_IOT_FILTERS = {
+  types: ["气象站", "土壤墒情站", "智能水阀", "摄像头"],
+  statuses: ["online", "offline", "fault"]
+};
+
+/** 设备类型 → 展示分类映射 */
+const YZT_DEVICE_CATEGORY_MAP = {
+  "水质监测":   { cat: "监测设备", icon: "water",  color: "#00B4D8" },
+  "增氧机":     { cat: "养殖设备", icon: "pump",   color: "#00D4FF" },
+  "水位监测":   { cat: "监测设备", icon: "level",  color: "#48CAE4" },
+  "尾水处理":   { cat: "环保设备", icon: "waste",  color: "#90E0EF" },
+  "摄像头":     { cat: "安防设备", icon: "camera", color: "#FFB800" },
+  "气象站":     { cat: "监测设备", icon: "weather", color: "#FF9F1C" },
+  "土壤墒情":   { cat: "监测设备", icon: "soil",   color: "#B388FF" },
+  "虫情测报灯": { cat: "监测设备", icon: "insect", color: "#E040FB" },
+  "杀虫灯":     { cat: "植保设备", icon: "lamp",   color: "#7C4DFF" },
+  "表型监测":   { cat: "监测设备", icon: "pheno",  color: "#536DFE" },
+  "变压器":     { cat: "电力设备", icon: "transformer", color: "#FF6B6B" },
+  "北斗基站":   { cat: "通信设备", icon: "beidou", color: "#00FF88" }
+};
+const YZT_DEVICE_CATEGORIES = ["监测设备", "安防设备", "养殖设备", "植保设备"];
+
+/** 农场 → 设备标记色系 */
+const YZT_FARM_DEVICE_COLORS = {
+  "白城牧场":   "#00FF88",
+  "镇南种羊场":  "#00D4FF"
+};
+
+/** 设备统计 */
+function getIotStats(devices) {
+  var total = 0;
+  YZT_DEVICE_COUNTS.forEach(function(c) { total += c.count; });
+  var online = Math.round(total * 0.92);
+  var offline = total - online;
+  var fault = Math.round(total * 0.03);
+  var onlineRate = 92;
+  if (devices && devices.length) {
+    online = devices.filter(function(d) { return d.online; }).length;
+    offline = devices.filter(function(d) { return !d.online && d.status === "offline"; }).length;
+    fault = devices.filter(function(d) { return d.status === "fault"; }).length;
+    total = devices.length;
+    onlineRate = total ? Math.round(online / total * 100) : 0;
+  }
+  return { total: total, online: online, offline: offline, fault: fault, onlineRate: onlineRate };
+}
+
+const YZT_WEATHER = {
+  temp: 23.6,
+  humidity: 68,
+  wind: "东南风 3级",
+  precip: 0.2,
+  soilTemp: 18.4,
+  soilMoist: 42,
+  forecast: [
+    { day: "今天", high: 26, low: 15, weather: "晴", precip: 0 },
+    { day: "明天", high: 24, low: 14, weather: "多云", precip: 10 },
+    { day: "后天", high: 22, low: 13, weather: "小雨", precip: 60 },
+    { day: "+3", high: 20, low: 12, weather: "阴", precip: 30 },
+    { day: "+4", high: 25, low: 14, weather: "晴", precip: 0 }
+  ],
+  alerts: [
+    { level: "yellow", text: "白城市：未来6小时有中到大雨，注意排涝" },
+    { level: "blue", text: "镇赉县：大风蓝色预警，平均风力5-6级" }
+  ]
+};
+
+const YZT_ALERTS = [
+  { type: "disaster", text: "【灾害预警】白城市洮北区发布暴雨黄色预警，请各农场做好排涝准备", warningId: "warn-001" },
+  { type: "farm", text: "【农事提醒】全区玉米进入灌浆期，建议加强水肥管理" },
+  { type: "disaster", text: "【灾害预警】镇赉县发布大风蓝色预警，注意温室加固", warningId: "warn-002" },
+  { type: "device", text: "【设备告警】白城牧场智能水阀-A12 流量异常，当前68%", deviceId: "dv001" }
+];
+
+/* 灾害预警 — 绑定具体地块 */
+const YZT_DISASTER_WARNINGS = [
+  {
+    id: "warn-001", plotId: "plot-baicheng-0", farmId: "baicheng",
+    level: "yellow", levelLabel: "黄色预警", type: "暴雨",
+    title: "暴雨黄色预警", region: "白城市洮北区",
+    text: "未来6小时将出现中到大雨，累计雨量40-60mm，请注意排涝。",
+    publishTime: "2025-05-20 14:30", advice: "关闭排水闸门检查、加强低洼地块巡查"
+  },
+  {
+    id: "warn-002", plotId: "plot-zhennan-1", farmId: "zhennan",
+    level: "blue", levelLabel: "蓝色预警", type: "大风",
+    title: "大风蓝色预警", region: "镇赉县",
+    text: "平均风力5-6级，阵风7级，请注意温室和大棚加固。",
+    publishTime: "2025-05-20 13:15", advice: "加固棚膜、暂停无人机作业"
+  }
+];
+
+function getWeatherForPlot(idx, farmName) {
+  const base = YZT_WEATHER;
+  return {
+    temp: +(base.temp - (idx % 5) + (idx % 3)).toFixed(1),
+    humidity: base.humidity - (idx % 12),
+    wind: base.wind,
+    precip: +(base.precip + (idx % 4) * 0.3).toFixed(1),
+    soilTemp: +(base.soilTemp - (idx % 3)).toFixed(1),
+    soilMoist: base.soilMoist - (idx % 8),
+    station: `${farmName}气象站`
+  };
+}
+
+function getDisasterForPlot(plotId) {
+  return YZT_DISASTER_WARNINGS.find((w) => w.plotId === plotId);
+}
+
+function getWarningsForPlots(plotIds) {
+  return YZT_DISASTER_WARNINGS.filter((w) => plotIds.includes(w.plotId));
+}
+
+const YZT_LAND_INPUT_CHART = {
+  categories: ["已发证", "已登记待发证", "已确权未登记", "未确权"],
+  area: [1860, 320, 180, 120],
+  count: [892, 156, 98, 140]
+};
+
+/* 地图筛选模式：填充色 + 边界样式 */
+const RIGHT_TYPE_COLORS = { "国有": "#00FF88", "集体": "#00D4FF", "承包": "#FFB800", "租赁": "#B388FF" };
+const RENT_TYPE_COLORS = { "统种地": "#00FF88", "外租地": "#00D4FF", "个人地": "#FFB800" };
+const HIGH_STD_COLORS = { "已完成": "#00FF88", "建设中": "#00D4FF", "规划中": "#FFB800", "非高标": "#6B7280" };
+const SALINE_COLORS = { "轻度盐碱": "#FFE066", "中度盐碱": "#FF9F43", "重度盐碱": "#FF6B6B", "苏打盐碱": "#B388FF" };
+const CROP_COLORS = { "玉米": "#00FF88", "大豆": "#00D4FF", "水稻": "#4FC3F7", "畜牧": "#FFB800", "果蔬": "#FF9F43", "中药材": "#B388FF", "杂粮": "#66FFBB", "牧草": "#00CC6A", "其他": "#9CA3AF" };
+
+const USE_TYPE_BORDERS = {
+  "耕地": { color: "#00FF88", weight: 3, dashArray: null },
+  "草地": { color: "#FFB800", weight: 2, dashArray: "10 5" },
+  "林地": { color: "#B388FF", weight: 2, dashArray: "6 4" },
+  "建设用地": { color: "#FF6B6B", weight: 2, dashArray: "4 4" },
+  "水域": { color: "#00D4FF", weight: 2, dashArray: "12 6" },
+  "其他": { color: "#9CA3AF", weight: 1, dashArray: "3 3" }
+};
+
+const CERT_STATUS_COLORS = {
+  "已发证": "#00FF88",
+  "已登记待发证": "#00D4FF",
+  "已确权未登记": "#FFB800",
+  "未确权": "#FF6B6B"
+};
+
+/** 地图地块权籍填色（全局统一语义）：深绿 / 浅绿 / 青 / 橙 */
+const MAP_CADASTRAL_LAYER_FILL = {
+  已发证: "#047857",
+  已登记待发证: "#6ee7b7",
+  已登记未发证: "#6ee7b7",
+  已确权未登记: "#0891b2",
+  未确权: "#ea580c"
+};
+
+function getCadastralMapFillColor(certStatus) {
+  if (!certStatus) return "#4b5563";
+  return MAP_CADASTRAL_LAYER_FILL[certStatus] || "#4b5563";
+}
+
+const REMOTE_STATUS_COLORS = {
+  "长势良好": "#00FF88",
+  "正常": "#00D4FF",
+  "需关注": "#FFB800",
+  "异常": "#FF6B6B"
+};
+
+const MAP_BASE_MODES = [
+  { id: "land", label: "权籍类型", fillKey: "rightType", fillMap: RIGHT_TYPE_COLORS, scope: "base" },
+  { id: "cert", label: "确权状态", fillKey: "certStatus", fillMap: CERT_STATUS_COLORS, scope: "base" }
+];
+
+const MAP_PLANT_MODES = [
+  { id: "crop", label: "作物分布", fillKey: "crop", fillMap: CROP_COLORS, scope: "planting" },
+  { id: "remote", label: "遥感监测", fillKey: "remoteStatus", fillMap: REMOTE_STATUS_COLORS, scope: "planting" }
+];
+
+/** @deprecated 兼容旧引用 */
+const MAP_FILTER_MODES = [...MAP_BASE_MODES, ...MAP_PLANT_MODES];
+
+const YZT_LAYER_LEGEND = {
+  land: LAND_RIGHT_TYPES.map((t) => ({ label: t, color: RIGHT_TYPE_COLORS[t] })),
+  cert: YZT_LAND_INPUT_CHART.categories.map((t) => ({
+    label: t,
+    color: typeof MAP_CADASTRAL_LAYER_FILL !== "undefined" ? MAP_CADASTRAL_LAYER_FILL[t] : CERT_STATUS_COLORS[t]
+  })),
+  rent: RENT_TYPES.map((t) => ({ label: t, color: RENT_TYPE_COLORS[t] })),
+  highStd: HIGH_STD_STATUS.map((t) => ({ label: t, color: HIGH_STD_COLORS[t] })),
+  saline: SALINE_TYPES.map((t) => ({ label: t, color: SALINE_COLORS[t] })),
+  crop: Object.entries(CROP_COLORS).slice(0, 6).map(([label, color]) => ({ label, color })),
+  remote: Object.entries(REMOTE_STATUS_COLORS).map(([label, color]) => ({ label, color })),
+  useBorder: Object.entries(USE_TYPE_BORDERS).map(([label, b]) => ({ label, color: b.color })),
+  iot: [
+    { label: "在线", color: "#00FF88" },
+    { label: "离线", color: "#FF6B6B" }
+  ]
+};
+
+/** 读取地块本底属性（土地资源、确权边界） */
+function getPlotBase(plot) {
+  return plot.base || plot;
+}
+
+/** 读取地块种植经营属性（作物、遥感等） */
+function getPlotPlanting(plot) {
+  return plot.planting || plot;
+}
+
+/** 合并本底 + 种植字段，供统计/兼容旧逻辑 */
+function getPlotFlat(plot) {
+  return { ...getPlotBase(plot), ...getPlotPlanting(plot) };
+}
+
+function filterByPermission(farmIds) {
+  return SUBSIDIARIES.filter((s) => farmIds.includes(s.id));
+}
+
+/** 统计/筛选用图斑（不直接绘制农场范围面） */
+const FARM_LAND_USE_PATCHES = [
+  { useType: "耕地", radius: 0.26, offset: [-0.02, 0.01], seed: 1.15, areaRatio: 0.52 },
+  { useType: "草地", radius: 0.14, offset: [0.2, 0.08], seed: 2.35, areaRatio: 0.16 },
+  { useType: "林地", radius: 0.11, offset: [-0.16, 0.12], seed: 3.42, areaRatio: 0.12 },
+  { useType: "建设用地", radius: 0.09, offset: [0.12, -0.06], seed: 5.12, areaRatio: 0.1 },
+  { useType: "水域", radius: 0.07, offset: [0.08, -0.14], seed: 4.68, areaRatio: 0.05 }
+];
+
+/** 地图底图（仅一层卫星瓦片，避免多源叠加变慢） */
+const MAP_BASE_TILE = {
+  url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  options: {
+    maxZoom: 16,
+    minZoom: 6,
+    keepBuffer: 2,
+    updateWhenIdle: true,
+    updateWhenZooming: false
+  }
+};
+
+/** 西片勾勒范围：覆盖白城牧场、镇南种羊场（含边距） */
+function getWestFarmBaselineBounds() {
+  const ids = ["baicheng", "zhennan"];
+  const farms = ids.map((id) => SUBSIDIARIES.find((s) => s.id === id)).filter(Boolean);
+  let minLat = Infinity;
+  let maxLat = -Infinity;
+  let minLng = Infinity;
+  let maxLng = -Infinity;
+  farms.forEach((s) => {
+    minLat = Math.min(minLat, s.lat);
+    maxLat = Math.max(maxLat, s.lat);
+    minLng = Math.min(minLng, s.lng);
+    maxLng = Math.max(maxLng, s.lng);
+  });
+  const padLat = 0.32;
+  const padLng = 0.42;
+  return [
+    [minLat - padLat, minLng - padLng],
+    [maxLat + padLat, maxLng + padLng]
+  ];
+}
+
+const LAND_BASELINE_BOUNDS = getWestFarmBaselineBounds();
+
+/** 土地资源默认视野：西片两农场居中 */
+const MAP_LAND_VIEW = {
+  center: [
+    (SUBSIDIARIES.find((s) => s.id === "baicheng").lat + SUBSIDIARIES.find((s) => s.id === "zhennan").lat) / 2,
+    (SUBSIDIARIES.find((s) => s.id === "baicheng").lng + SUBSIDIARIES.find((s) => s.id === "zhennan").lng) / 2
+  ],
+  zoom: 9
+};
+
+/** 土地资源 · 勾勒底线（透明 PNG，对齐西片农场范围） */
+const LAND_BASELINE_LINE_STYLE = {
+  width: 2579,
+  height: 1432,
+  opacity: 1,
+  background: "rgba(249, 243, 243, 0)",
+  border: "5px dashed #FFFFFF",
+  boxShadow: "20px 4px 200px rgba(0, 0, 0, 0.302)"
+};
+
+const LAND_BASELINE_OVERLAY = {
+  url: "assets/map/jilin-land-baseline-transparent.png",
+  bounds: LAND_BASELINE_BOUNDS,
+  opacity: LAND_BASELINE_LINE_STYLE.opacity,
+  style: LAND_BASELINE_LINE_STYLE
+};
+
+const FARM_STATS_PARCEL_COUNT = {
+  baicheng: 86,
+  zhennan: 72
+};
+
+/** 农场所属行政区（权籍调查面积按行政区统计） */
+const FARM_ADMIN_REGION = {
+  baicheng: "白城市",
+  zhennan: "镇赉县"
+};
+
+/** 行政区权籍调查目标面积（万公顷），用于完成率 */
+const LAND_ADMIN_REGION_TARGETS = {
+  "白城市": 85,
+  "镇赉县": 72
+};
+
+/** 土地利用堆叠顺序（分组水平堆叠条） */
+const LAND_USE_STACK_ORDER = ["耕地", "草地", "林地", "建设用地"];
+
+/** 宗地类型 100% 堆叠条顺序（水域/林地等并入「其他」） */
+const LAND_PARCEL_TYPE_ORDER = ["耕地", "建设用地", "其他", "草地"];
+
+/** 土地资源 · 农场下钻精准展示数据（万亩 / 占比） */
+/** 挂载到 window，确保下钻脚本可读取 */
+/** 农场下钻面板语义色：深绿=已完成，浅绿=进行中，青=待处理，橙=预警，灰=基线 */
+const FARM_DRILL_LAND_USE_COLORS = {
+  耕地: "#047857",
+  草地: "#6ee7b7",
+  其他: "#0891b2",
+  建设用地: "#4b5563"
+};
+
+const FARM_DRILL_CERT_COLORS = {
+  已发证: "#047857",
+  已登记待发证: "#6ee7b7",
+  已确权未登记: "#0891b2",
+  未确权: "#ea580c",
+  总面积: "#4b5563"
+};
+
+const FARM_LAND_DRILL = {
+  baicheng: {
+    name: "白城牧场",
+    location: "白城市洮北区平安镇",
+    totalAreaMu: 184.3,
+    cropAreaMu: 100.0,
+    cropPct: 54.2,
+    certCompletePct: 14.5,
+    plotCount: 86,
+    landUseConclusion: "耕地占比54.2%，土地结构稳定",
+    certHeroLabel: "总完成率（已发证）",
+    certConclusion: "确权进度需持续推进，建议加快登记与颁证衔接",
+    villageConclusion: "2个行政村完成率低于15%，需重点督导",
+    landUse: [
+      { name: "耕地", pct: 54.2, areaMu: 99.9 },
+      { name: "其他", pct: 18.3, areaMu: 33.7 },
+      { name: "草地", pct: 16.6, areaMu: 30.6 },
+      { name: "建设用地", pct: 10.9, areaMu: 20.1 }
+    ],
+    certWaterfall: [
+      { kind: "bar", label: "总面积", areaMu: 184.3, sharePct: 100.0, color: FARM_DRILL_CERT_COLORS.总面积 },
+      { kind: "seg", label: "已发证", areaMu: 26.7, sharePct: 14.5, color: FARM_DRILL_CERT_COLORS.已发证 },
+      { kind: "seg", label: "已登记未发证", areaMu: 26.3, sharePct: 14.3, color: FARM_DRILL_CERT_COLORS.已登记待发证 },
+      { kind: "seg", label: "已确权未登记", areaMu: 24.7, sharePct: 13.4, color: FARM_DRILL_CERT_COLORS.已确权未登记 },
+      { kind: "seg", label: "未确权", areaMu: 106.6, sharePct: 57.8, color: FARM_DRILL_CERT_COLORS.未确权 }
+    ],
+    villages: [
+      { name: "平安村", rate: 9.2 },
+      { name: "青山村", rate: 11.4 },
+      { name: "平台村", rate: 13.8 },
+      { name: "洮北村", rate: 15.2 },
+      { name: "三联村", rate: 17.6 }
+    ],
+    certParcelCounts: {
+      已发证: 12,
+      已登记未发证: 12,
+      已确权未登记: 12,
+      未确权: 50
+    }
+  },
+  zhennan: {
+    name: "镇南种羊场",
+    location: "白城市镇赉县",
+    totalAreaMu: 139.8,
+    cropAreaMu: 75.6,
+    cropPct: 54.1,
+    certCompletePct: 12.9,
+    plotCount: 72,
+    landUseConclusion: "耕地占比54.1%，土地结构稳定",
+    certHeroLabel: "总完成率（已发证）",
+    certConclusion: "确权进度偏慢，剩余未确权86.2万亩，需重点推进",
+    villageConclusion: "3个行政村完成率低于15%，需重点督导",
+    landUse: [
+      { name: "耕地", pct: 54.1, areaMu: 75.6 },
+      { name: "其他", pct: 18.5, areaMu: 25.9 },
+      { name: "草地", pct: 16.5, areaMu: 23.1 },
+      { name: "建设用地", pct: 10.9, areaMu: 15.2 }
+    ],
+    certWaterfall: [
+      { kind: "bar", label: "总面积", areaMu: 139.8, sharePct: 100.0, color: FARM_DRILL_CERT_COLORS.总面积 },
+      { kind: "seg", label: "已发证", areaMu: 18.0, sharePct: 12.9, color: FARM_DRILL_CERT_COLORS.已发证 },
+      { kind: "seg", label: "已登记未发证", areaMu: 18.3, sharePct: 13.1, color: FARM_DRILL_CERT_COLORS.已登记待发证 },
+      { kind: "seg", label: "已确权未登记", areaMu: 17.3, sharePct: 12.4, color: FARM_DRILL_CERT_COLORS.已确权未登记 },
+      { kind: "seg", label: "未确权", areaMu: 86.2, sharePct: 61.6, color: FARM_DRILL_CERT_COLORS.未确权 }
+    ],
+    villages: [
+      { name: "永治村", rate: 8.7 },
+      { name: "新风村", rate: 10.2 },
+      { name: "友谊村", rate: 13.5 },
+      { name: "建平村", rate: 15.1 },
+      { name: "坦途村", rate: 16.5 }
+    ],
+    /** 地图「筛选统计」与权籍分项块数（整数，合计等于 plotCount） */
+    certParcelCounts: {
+      已发证: 9,
+      已登记未发证: 9,
+      已确权未登记: 9,
+      未确权: 45
+    }
+  }
+};
+if (typeof window !== "undefined") window.FARM_LAND_DRILL = FARM_LAND_DRILL;
+
+/** 土地资源 · 左右栏五项数据分析标题 */
+const LAND_ANALYSIS_CHARTS = {
+  farmCadastral: "农场权籍调查面积统计",
+  farmLandUse: "农场土地利用类型面积统计",
+  parcelTypeRatio: "集团宗地类型占比分析",
+  regionCadastral: "相关行政区权籍调查面积统计",
+  groupCadastral: "集团权籍调查面积统计"
+};
+
+if (typeof getCadastralMapFillColor !== "function") {
+  const CADASTRAL_MAP_FILL_COLORS = {
+    "已发证": "#047857",
+    "已登记待发证": "#6ee7b7",
+    "已登记未发证": "#6ee7b7",
+    "已确权未登记": "#0891b2",
+    "未确权": "#ea580c"
+  };
+  window.getCadastralMapFillColor = function (certStatus) {
+    if (!certStatus) return "#4b5563";
+    return CADASTRAL_MAP_FILL_COLORS[certStatus] || "#4b5563";
+  };
+}
+
+function getLandResourceZones(farmIds) {
+  const zones = [];
+  farmIds.forEach((id, fi) => {
+    const s = SUBSIDIARIES.find((x) => x.id === id);
+    if (!s) return;
+    const count = FARM_STATS_PARCEL_COUNT[id] || 50;
+    const farmArea = parseFloat(s.area);
+
+    for (let i = 0; i < count; i++) {
+      const patch = FARM_LAND_USE_PATCHES[i % FARM_LAND_USE_PATCHES.length];
+      const layout = PLOT_FIELD_LAYOUT[i % PLOT_FIELD_LAYOUT.length];
+      const idx = fi * 200 + i;
+      const jitterLat = Math.sin(idx * 1.9) * patch.radius * 0.35;
+      const jitterLng = Math.cos(idx * 2.2) * patch.radius * 0.42;
+      const useType = patch.useType;
+      const certStatus = YZT_LAND_INPUT_CHART.categories[idx % 4];
+      const area = +(farmArea * patch.areaRatio / FARM_LAND_USE_PATCHES.length * (0.85 + (idx % 5) * 0.03)).toFixed(3);
+      const plotCode = `JL-LD-${id.slice(0, 2).toUpperCase()}-${String(i + 1).padStart(4, "0")}`;
+      const contractor = ["农垦集团", "家庭农场", "合作社", "种植大户"][idx % 4]
+        + ` · ${["张某", "李某", "王某", "赵某"][(idx + i) % 4]}`;
+      const certDeadline = certStatus === "未确权"
+        ? "—"
+        : `202${(idx % 4) + 6}-${String(((idx + i) % 9) + 1).padStart(2, "0")}-${String(((idx * 3 + i) % 26) + 1).padStart(2, "0")}`;
+
+      zones.push({
+        id: `stat-${id}-${i}`,
+        zoneType: "use-patch",
+        farmId: id,
+        farmName: s.name,
+        zoneName: `宗地${10001 + (idx % 8999)}`,
+        plotCode,
+        lat: s.lat + patch.offset[0] + jitterLat,
+        lng: s.lng + patch.offset[1] + jitterLng,
+        area,
+        parcelW: layout.hw * (0.72 + (idx % 4) * 0.04),
+        parcelH: layout.hh * (0.72 + (idx % 3) * 0.05),
+        fieldSeed: s.lat * 3.1 + s.lng * 2.7 + idx * 0.83,
+        base: {
+          rightType: LAND_RIGHT_TYPES[idx % 4],
+          useType,
+          certStatus,
+          rentType: RENT_TYPES[idx % 3],
+          highStd: HIGH_STD_STATUS[idx % 4],
+          saline: null,
+          boundaryCode: plotCode,
+          confirmedArea: certStatus === "未确权" ? null : +(area * 0.92).toFixed(3),
+          contractor,
+          certDeadline
+        }
+      });
+    }
+  });
+  return zones;
+}
+
+/** 种植地块散落布局（矩形田块，非整齐网格） */
+const PLOT_FIELD_LAYOUT = [
+  { dl: 0.012, dg: -0.008, hw: 0.016, hh: 0.012 },
+  { dl: -0.018, dg: 0.022, hw: 0.014, hh: 0.01 },
+  { dl: 0.034, dg: 0.014, hw: 0.018, hh: 0.013 },
+  { dl: -0.008, dg: -0.028, hw: 0.013, hh: 0.011 },
+  { dl: 0.042, dg: -0.018, hw: 0.015, hh: 0.012 },
+  { dl: -0.032, dg: -0.006, hw: 0.017, hh: 0.014 },
+  { dl: 0.022, dg: 0.032, hw: 0.012, hh: 0.009 },
+  { dl: -0.024, dg: 0.038, hw: 0.016, hh: 0.011 },
+  { dl: 0.048, dg: 0.026, hw: 0.014, hh: 0.01 },
+  { dl: 0.006, dg: -0.042, hw: 0.015, hh: 0.012 },
+  { dl: -0.044, dg: 0.016, hw: 0.013, hh: 0.01 },
+  { dl: 0.038, dg: -0.036, hw: 0.016, hh: 0.012 }
+];
+
+function getPlotsForFarms(farmIds) {
+  const plots = [];
+  farmIds.forEach((id, fi) => {
+    const s = SUBSIDIARIES.find((x) => x.id === id);
+    if (!s) return;
+    const count = fi === 0 ? 10 : 8;
+    let plotNo = 108 + fi * 20;
+
+    for (let j = 0; j < count; j++) {
+      const layout = PLOT_FIELD_LAYOUT[(fi * 3 + j) % PLOT_FIELD_LAYOUT.length];
+      const idx = fi * 12 + j;
+      const jitterLat = Math.sin(idx * 1.7 + fi) * 0.004;
+      const jitterLng = Math.cos(idx * 2.1 + fi) * 0.005;
+      plotNo += 1;
+      const cropName = j === 0 ? s.crop : YZT_CROPS[idx % YZT_CROPS.length].name;
+      const cropMeta = YZT_CROPS.find((item) => item.name === cropName) || YZT_CROPS[0];
+      const certStatus = YZT_LAND_INPUT_CHART.categories[idx % 4];
+      const area = +(parseFloat(s.area) / (count * 2.8)).toFixed(2);
+      const contractor = ["农垦集团", "家庭农场", "合作社", "种植大户"][(idx + j) % 4] + ` · ${["张某", "李某", "王某", "赵某"][(idx + j * 2) % 4]}`;
+      const confirmDeadline =
+        certStatus === "未确权"
+          ? "—"
+          : `202${(idx % 4) + 6}-${String(((idx + j) % 9) + 1).padStart(2, "0")}-${String(((idx * 3 + j) % 26) + 1).padStart(2, "0")}`;
+
+      plots.push({
+        id: `plot-${id}-${j}`,
+        farmId: id,
+        farmName: s.name,
+        plotName: `${plotNo}号地`,
+        plotLabel: `${plotNo}号地`,
+        lat: s.lat + layout.dl + jitterLat,
+        lng: s.lng + layout.dg + jitterLng,
+        area,
+        parcelW: layout.hw,
+        parcelH: layout.hh,
+        fieldSeed: s.lat * 3.1 + s.lng * 2.7 + idx * 0.83,
+        base: {
+          rightType: LAND_RIGHT_TYPES[idx % 4],
+          useType: "耕地",
+          certStatus,
+          rentType: RENT_TYPES[idx % 3],
+          highStd: HIGH_STD_STATUS[idx % 4],
+          saline: null,
+          boundaryCode: `JL-NF-${id.slice(0, 2).toUpperCase()}-${String(plotNo).padStart(3, "0")}`,
+          confirmedArea: certStatus === "未确权" ? null : +(area * 0.94).toFixed(2),
+          contractor,
+          confirmDeadline,
+          issueDate: certStatus === "已发证" ? `202${(idx % 3) + 3}-06-12` : "—",
+          registerDate: certStatus === "已发证" || certStatus === "已登记待发证" ? `202${(idx % 2) + 4}-03-20` : "—",
+          confirmDate: certStatus !== "未确权" ? `202${(idx % 2) + 5}-08-01` : "—",
+          eastTo: "邻接耕地",
+          southTo: "田间路",
+          westTo: "排水渠",
+          northTo: "集体地界"
+        },
+        planting: {
+          crop: cropName,
+          variety: cropMeta.varieties[idx % cropMeta.varieties.length],
+          sowProgress: 68 + (idx % 28),
+          harvestProgress: idx % 2 === 0 ? 42 + (idx % 35) : 0,
+          sowDate: `2025-0${(idx % 4) + 4}-${10 + (idx % 18)}`,
+          expectedYield: +(420 + idx * 18).toFixed(0),
+          ndvi: +(0.62 + (idx % 8) * 0.04).toFixed(2),
+          remoteStatus: ["长势良好", "正常", "需关注", "异常"][idx % 4],
+          remoteDate: "2025-05-18"
+        },
+        weather: getWeatherForPlot(idx, s.name)
+      });
+    }
+  });
+  return plots;
+}

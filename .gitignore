@@ -1,0 +1,5 @@
+node_modules/
+*.py
+generate_buttons.js
+.DS_Store
+Thumbs.db

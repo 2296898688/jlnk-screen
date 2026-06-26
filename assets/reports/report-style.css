@@ -1,0 +1,16 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #333; line-height: 1.8; font-size: 20px; }
+.report { max-width: 1100px; margin: 40px auto; background: #fff; padding: 60px 70px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+.report h1 { font-size: 34px; text-align: center; margin-bottom: 30px; color: #1a3a2a; }
+.report h2 { font-size: 26px; color: #2d6a4f; margin: 28px 0 14px; padding-bottom: 8px; border-bottom: 1px solid #d8d8d8; }
+.report h3 { font-size: 22px; color: #40916c; margin: 18px 0 10px; }
+.report .meta { text-align: center; color: #888; margin-bottom: 30px; font-size: 18px; }
+.report .meta span { margin: 0 12px; }
+.report p { margin-bottom: 10px; text-indent: 2em; }
+.report table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+.report th, .report td { border: 1px solid #ddd; padding: 8px 12px; text-align: center; font-size: 18px; }
+.report th { background: #e8f5e9; color: #2d6a4f; font-weight: 600; }
+.report ul { margin: 10px 0 10px 2em; }
+.report li { margin-bottom: 6px; }
+.report .highlight { background: #fff9c4; padding: 12px 16px; border-left: 4px solid #ffb300; margin: 14px 0; }
+.report .img-placeholder { background: #e0e0e0; height: 200px; display: flex; align-items: center; justify-content: center; color: #999; margin: 16px 0; border-radius: 4px; font-size: 14px; }
